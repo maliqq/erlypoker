@@ -63,10 +63,14 @@
 -define(GAME_TRIPLE27, 10).
 -define(GAME_BADUGI, 11).
 
+-define(GAMES, [{?GAME_TEXAS, "texas"}, {?GAME_OMAHA, "omaha"}, {?GAME_OMAHA8, "omaha8"}, {?GAME_STUD, "stud"}, {?GAME_STUD8, "stud8"}, {?GAME_RAZZ, "razz"}, {?GAME_LONDON, "london"}, {?GAME_DRAW5, "draw5"}, {?GAME_SINGLE27, "single27"}, {?GAME_TRIPLE27, "triple27"}, {?GAME_BADUGI, "badugi"}]).
+
 %% limits
 -define(LIMIT_FIXED, 1).
 -define(LIMIT_POT, 2).
 -define(LIMIT_NO, 3).
+
+-define(LIMITS, [{?LIMIT_FIXED, "FL"}, {?LIMIT_POT, "PL"}, {?LIMIT_NO, "NL"}]).
 
 cards() ->
 	[new_card(Kind, Suit) || Kind <- ?KINDS, Suit <- ?SUITS].
@@ -213,9 +217,7 @@ new_hand(Cards, Rank) ->
 		?RANK_BADUGI -> rank_badugi(Cards)
 	end.
 
--define(CARD, "Ah").
-
 poker() ->
-	io:format(card_to_string(lists:nth(1, cards_from_string(?CARD)))).
+	io:format(card_to_string(lists:nth(1, cards_from_string("Kc")))).
 	%%io:format(deck_to_string(new_deck())).
 
