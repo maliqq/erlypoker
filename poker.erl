@@ -7,6 +7,8 @@
 -define(SUIT_HEART, 3).
 -define(SUIT_DIAMOND, 4).
 
+-define(SUITS, [?SUIT_SPADE, ?SUIT_CLUB, ?SUIT_HEART, ?SUIT_DIAMOND]).
+
 %% kinds
 -define(KIND_DEUCE, 1).
 -define(KIND_THREE, 2).
@@ -21,6 +23,8 @@
 -define(KIND_QUEEN, 11).
 -define(KIND_KING, 12).
 -define(KIND_ACE, 13).
+
+-define(KINDS, [?KIND_DEUCE, ?KIND_THREE, ?KIND_FOUR, ?KIND_FIVE, ?KIND_SIX, ?KIND_SEVEN, ?KIND_NINE, ?KIND_TEN, ?KIND_JACK, ?KIND_QUEEN, ?KIND_KING, ?KIND_ACE]).
 
 %% types
 -define(TYPE_HOLDEM, 1).
@@ -52,6 +56,18 @@
 -define(LIMIT_FIXED, 1).
 -define(LIMIT_POT, 2).
 -define(LIMIT_NO, 3).
+
+cards() ->
+	[new_card(Kind, Suit) || Kind <- ?KINDS, Suit <- ?SUITS].
+
+shuffle(Cards) ->
+	lists:map(fun(Elem) -> element(2, Elem) end, lists:keysort(1, lists:map(fun(Card) -> {random:uniform(), Card} end, Cards))).
+
+new_deck() ->
+	shuffle(cards()).
+
+deck_to_string(Deck) ->
+	lists:concat(lists:map(fun(Card) -> card_to_string(Card) end, Deck)).
 
 suit_to_string(Suit) when is_integer(Suit) ->
 	case Suit of
@@ -103,12 +119,12 @@ kind_to_char(Kind) when is_integer(Kind) ->
 		?KIND_ACE -> "A"
 	end.
 
-card(Kind, Suit) ->
+new_card(Kind, Suit) ->
 	{Kind, Suit}.
 
 card_to_string(Card) ->
 	kind_to_char(element(1, Card)) ++ suit_to_char(element(2, Card)).
 
 poker() ->
-	io:format(card_to_string(card(11, 2))).
+	io:format(deck_to_string(new_deck())).
 
