@@ -7,7 +7,7 @@
 -define(SUIT_HEART, 3).
 -define(SUIT_DIAMOND, 4).
 
--define(SUITS, [?SUIT_SPADE, ?SUIT_CLUB, ?SUIT_HEART, ?SUIT_DIAMOND]).
+-define(SUITS, [{?SUIT_SPADE, "s"}, {?SUIT_CLUB, "c"}, {?SUIT_HEART, "h"}, {?SUIT_DIAMOND, "d"}]).
 
 %% kinds
 -define(KIND_DEUCE, 1).
@@ -24,7 +24,7 @@
 -define(KIND_KING, 12).
 -define(KIND_ACE, 13).
 
--define(KINDS, [?KIND_DEUCE, ?KIND_THREE, ?KIND_FOUR, ?KIND_FIVE, ?KIND_SIX, ?KIND_SEVEN, ?KIND_NINE, ?KIND_TEN, ?KIND_JACK, ?KIND_QUEEN, ?KIND_KING, ?KIND_ACE]).
+-define(KINDS, [{?KIND_DEUCE, "2"}, {?KIND_THREE, "3"}, {?KIND_FOUR, "4"}, {?KIND_FIVE, "5"}, {?KIND_SIX, "6"}, {?KIND_SEVEN, "7"}, {?KIND_NINE, "9"}, {?KIND_TEN, "T"}, {?KIND_JACK, "J"}, {?KIND_QUEEN, "Q"}, {?KIND_KING, "K"}, {?KIND_ACE, "A"}]).
 
 %% types
 -define(TYPE_HOLDEM, 1).
@@ -91,9 +91,9 @@ suit_to_string(Suit) when is_integer(Suit) ->
 suit_to_char(Suit) when is_integer(Suit) ->
 	case Suit of
 		?SUIT_SPADE -> "♠";
-		?SUIT_CLUB -> "♥";
-		?SUIT_HEART -> "♦";
-		?SUIT_DIAMOND -> "♣"
+		?SUIT_HEART -> "♥";
+		?SUIT_DIAMOND -> "♦";
+		?SUIT_CLUB -> "♣"
 	end.
 
 kind_to_string(Kind) when is_integer(Kind) ->
@@ -114,24 +114,25 @@ kind_to_string(Kind) when is_integer(Kind) ->
 	end.
 
 kind_to_char(Kind) when is_integer(Kind) ->
-	case Kind of
-		?KIND_DEUCE -> "2";
-		?KIND_THREE -> "3";
-		?KIND_FOUR -> "4";
-		?KIND_FIVE -> "5";
-		?KIND_SIX -> "6";
-		?KIND_SEVEN -> "7";
-		?KIND_EIGHT -> "8";
-		?KIND_NINE -> "9";
-		?KIND_TEN -> "T";
-		?KIND_JACK -> "J";
-		?KIND_QUEEN -> "Q";
-		?KIND_KING -> "K";
-		?KIND_ACE -> "A"
-	end.
+	element(2, lists:keyfind(Kind, 1, ?KINDS)).
+
+kind_from_string(String) ->
+	element(1, lists:keyfind(String, 2, ?KINDS)).
+
+suit_from_string(String) ->
+	element(1, lists:keyfind(String, 2, ?SUITS)).
+
+new_card(Kind, Suit) when is_integer(Kind), is_integer(Suit) ->
+	{Kind, Suit};
 
 new_card(Kind, Suit) ->
-	{Kind, Suit}.
+	new_card(kind_from_string(Kind), suit_from_string(Suit)).
+
+cards_from_string(String) ->
+	lists:map(fun(Match1) ->
+		[K, S] = re:split(string:substr(String, element(1, Match1) + 1, element(2, Match1) + 1), "", [{return, list}, {parts, 2}]),
+		new_card(K, S)
+	end, element(2, re:run(String, "[AKQJT0-9]{1}[schd]{1}"))).
 
 card_to_string(Card) ->
 	kind_to_char(element(1, Card)) ++ suit_to_char(element(2, Card)).
@@ -143,7 +144,7 @@ hand_to_string(Hand) ->
 	end.
 
 rank_high(Cards) ->
-	rank_high(Cards, [fun a/1, fun b/1]).
+	rank_high(Cards, [fun is_straight_flush/1, fun is_four_kind/1, fun is_full_house/1, fun is_flush/1, fun is_straight/1, fun is_three_kind/1, fun is_two_pair/1, fun is_one_pair/1, fun is_high_card/1]).
 
 rank_high(Cards, []) ->
 	?HIGH_CARD;
@@ -154,11 +155,38 @@ rank_high(Cards, [F|List]) ->
 		Hand -> hand_to_string(Hand)
 	end.
 
-a(Cards) ->
+is_straight_flush(Cards) ->
 	none.
 
-b(Cards) ->
-	?FULL_HOUSE.
+is_four_kind(Cards) ->
+	none.
+
+is_full_house(Cards) ->
+	none.
+
+paired(Cards) ->
+	[].
+
+suited(Cards) ->
+	[].
+
+is_flush(Cards) ->
+	none.
+
+is_straight(Cards) ->
+	none.
+
+is_three_kind(Cards) ->
+	none.
+
+is_two_pair(Cards) ->
+	none.
+
+is_one_pair(Cards) ->
+	none.
+
+is_high_card(Cards) ->
+	?HIGH_CARD.
 
 rank_low(Cards) ->
 	ok.
@@ -185,7 +213,9 @@ new_hand(Cards, Rank) ->
 		?RANK_BADUGI -> rank_badugi(Cards)
 	end.
 
+-define(CARD, "Ah").
+
 poker() ->
-	io:format(new_hand(new_deck(), ?RANK_HIGH)).
+	io:format(card_to_string(lists:nth(1, cards_from_string(?CARD)))).
 	%%io:format(deck_to_string(new_deck())).
 
