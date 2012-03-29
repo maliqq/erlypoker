@@ -103,6 +103,12 @@ kind_to_char(Kind) when is_integer(Kind) ->
 		?KIND_ACE -> "A"
 	end.
 
+card(Kind, Suit) ->
+	{Kind, Suit}.
+
+card_to_string(Card) ->
+	kind_to_char(element(1, Card)) ++ suit_to_char(element(2, Card)).
+
 poker() ->
-	io:format(kind_to_char(11)).
+	io:format(card_to_string(card(11, 2))).
 
