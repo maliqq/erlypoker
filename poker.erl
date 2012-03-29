@@ -39,6 +39,17 @@
 -define(RANK_DEUCE7, 5).
 -define(RANK_BADUGI, 6).
 
+%% high card combinations
+-define(HIGH_CARD, 1).
+-define(STRAIGHT_FLUSH, 2).
+-define(FOUR_KIND, 3).
+-define(FULL_HOUSE, 4).
+-define(FLUSH, 5).
+-define(STRAIGHT, 6).
+-define(THREE_KIND, 7).
+-define(TWO_PAIR, 8).
+-define(ONE_PAIR, 9).
+
 %% games
 -define(GAME_TEXAS, 1).
 -define(GAME_OMAHA, 2).
@@ -125,6 +136,56 @@ new_card(Kind, Suit) ->
 card_to_string(Card) ->
 	kind_to_char(element(1, Card)) ++ suit_to_char(element(2, Card)).
 
+hand_to_string(Hand) ->
+	case Hand of
+		?FULL_HOUSE -> "full house";
+		?HIGH_CARD -> "high card"
+	end.
+
+rank_high(Cards) ->
+	rank_high(Cards, [fun a/1, fun b/1]).
+
+rank_high(Cards, []) ->
+	?HIGH_CARD;
+
+rank_high(Cards, [F|List]) ->
+	case F(Cards) of
+		none -> rank_high(Cards, List);
+		Hand -> hand_to_string(Hand)
+	end.
+
+a(Cards) ->
+	none.
+
+b(Cards) ->
+	?FULL_HOUSE.
+
+rank_low(Cards) ->
+	ok.
+
+rank_low8(Cards) ->
+	ok.
+
+rank_ace6(Cards) ->
+	ok.
+
+rank_deuce7(Cards) ->
+	ok.
+
+rank_badugi(Cards) ->
+	ok.
+
+new_hand(Cards, Rank) ->
+	case Rank of
+		?RANK_HIGH -> rank_high(Cards);
+		?RANK_LOW -> rank_low(Cards);
+		?RANK_LOW8 -> rank_low8(Cards);
+		?RANK_ACE6 -> rank_ace6(Cards);
+		?RANK_DEUCE7 -> rank_deuce7(Cards);
+		?RANK_BADUGI -> rank_badugi(Cards)
+	end.
+
 poker() ->
-	io:format(deck_to_string(new_deck())).
+	io:format(new_hand(new_deck(), ?RANK_HIGH)).
+	%%io:format(deck_to_string(new_deck())).
 
