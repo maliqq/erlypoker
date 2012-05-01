@@ -83,8 +83,8 @@ is_badugi2(Cards) ->
 is_badugi1(Cards) ->
   case has_paired(Cards, 4) or has_suited(Cards, 4) of
     true ->
-      Highest = highest_card(Cards),
-      #hand{id = ?BADUGI, rank = {?BADUGI1, Highest#card.kind}, value = Highest};
+      Lowest = lowest_card(Cards),
+      #hand{id = ?BADUGI, rank = {?BADUGI1, Lowest#card.kind}, value = Lowest};
     _Else -> false
   end.
 

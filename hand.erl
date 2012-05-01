@@ -2,6 +2,7 @@
 
 -include("hand/high_card.erl").
 -include("hand/badugi_hand.erl").
+-include("hand/low_hand.erl").
 
 -define(RANKS, [{"high", ?RANK_HIGH, fun high_card/1}, {"badugi", ?RANK_BADUGI, fun badugi_hand/1}]).
 

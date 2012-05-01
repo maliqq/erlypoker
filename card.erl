@@ -70,18 +70,19 @@ diff_cards(A, B) -> erlang:abs(card_index(A) - card_index(B)).
 
 %% from A to 2
 high_cards(Cards) -> lists:sort(fun compare_cards/2, Cards).
-high_cards(Cards, Num) when is_integer(Num) -> lists:sublist(high_cards(Cards), Num).
+high_cards(Cards, N) when is_integer(N) -> lists:sublist(high_cards(Cards), N).
 %%
 low_cards(Cards) -> lists:sort(fun compare_cards_low/2, Cards).
+low_cards(Cards, N) when is_integer(N) -> lists:sublist(low_cards(Cards), N).
 
 %%
 highest_card(Cards) -> [Highest | _] = lists:sort(fun compare_cards/2, Cards), Highest.
 lowest_card(Cards) -> [Lowest | _] = lists:sort(fun compare_cards_low/2, Cards), Lowest.
 %%
-kicker_cards(Cards, Except, Num) ->
+kicker_cards(Cards, Except, N) when is_integer(N) ->
   Kinds = lists:map(fun(X) -> X#card.kind end, Except),
   Kickers = lists:filter(fun(X) -> not lists:member(X#card.kind, Kinds) end, Cards),
-  high_cards(Kickers, Num).
+  high_cards(Kickers, N).
 
 %% group cards
 group_cards(_, [], Buf, F) when is_function(F) ->
