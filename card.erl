@@ -1,7 +1,5 @@
 -record(card, {kind, suit}).
--record(group_kind, {kind, value}).
--record(group_suit, {suit, value}).
--record(straight_row, {to, value}).
+-record(card_group, {kind = none, suit = none, value}).
 
 -define(SUITS, ["s", "h", "d", "c"]).
 -define(KINDS, ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]).
@@ -33,13 +31,14 @@ build_card(String) -> [Kind, Suit] = re:split(String, "", [{return, list}, {part
 parse_cards(String) ->
 	{_, Result} = re:run(String, "([akqjt2-9]{1})([shdc]{1})", [global, caseless, {capture, [1, 2], list}]),
 	lists:map(fun([Kind, Suit]) -> build_card(Kind, Suit) end, Result).
+cards(String) -> parse_cards(String).
 
 %% all cards
 cards() -> [build_card(Kind, Suit) || Kind <- ?KINDS, Suit <- ?SUITS].
 
 %%
 card_to_string(Card) when is_record(Card, card) -> io_lib:format("~s~ts", [Card#card.kind, suit_to_char(Card#card.suit)]);
-card_to_string(Card) when is_record(Card, group_kind) -> io_lib:format("~s{~ts}", [Card#group_kind.kind, string:join(lists:map(fun(C) -> suit_to_char(C#card.suit) end, Card#group_kind.value), "")]).
+card_to_string(Card) when is_record(Card, card_group) -> io_lib:format("~s{~ts}", [Card#card_group.kind, string:join(lists:map(fun(C) -> suit_to_char(C#card.suit) end, Card#card_group.value), "")]).
 
 %%
 cards_to_string(Cards) -> string:join(lists:map(fun(Card) -> card_to_string(Card) end, Cards), " ").
@@ -51,7 +50,7 @@ card_to_integer(Card) ->
 %%
 card_index(N, _) when is_integer(N) -> N rem erlang:length(?KINDS);
 card_index(Card, Low) when is_record(Card, card) -> card_index(Card#card.kind, Low);
-card_index(Card, Low) when is_record(Card, group_kind) -> card_index(Card#group_kind.kind, Low);
+card_index(Card, Low) when is_record(Card, card_group) -> card_index(Card#card_group.kind, Low);
 card_index(Card, Low) ->
   Kinds = if
     Low -> [Ace | Tail] = ?KINDS, Tail ++ [Ace];
@@ -61,31 +60,28 @@ card_index(Card, Low) ->
 	{_, Index} = lists:keyfind(Card, 1, Map),
 	Index.
 card_index(Card) -> card_index(Card, false).
-card_weight(Card) -> erlang:length(?KINDS) - card_index(Card).
 
 %%
 compare_cards(A, B) -> card_index(A) =< card_index(B).
-compare_cards2(A, B) -> card_index(B) =< card_index(A).
+compare_cards_low(A, B) -> card_index(B, true) =< card_index(A, true).
 
 %%
 diff_cards(A, B) -> erlang:abs(card_index(A) - card_index(B)).
 
 %% from A to 2
-sorted_cards(Cards) -> lists:sort(fun compare_cards/2, Cards).
-sorted_cards(Cards, Num) when is_integer(Num) -> lists:sublist(sorted_cards(Cards), Num).
-
-%% from 2 to A
-sorted_cards2(Cards) -> lists:sort(fun compare_cards2/2, Cards).
-sorted_cards2(Cards, Num) when is_integer(Num) -> lists:sublist(sorted_cards2(Cards), Num). 
+high_cards(Cards) -> lists:sort(fun compare_cards/2, Cards).
+high_cards(Cards, Num) when is_integer(Num) -> lists:sublist(high_cards(Cards), Num).
+%%
+low_cards(Cards) -> lists:sort(fun compare_cards_low/2, Cards).
 
 %%
 highest_card(Cards) -> [Highest | _] = lists:sort(fun compare_cards/2, Cards), Highest.
-
+lowest_card(Cards) -> [Lowest | _] = lists:sort(fun compare_cards_low/2, Cards), Lowest.
 %%
 kicker_cards(Cards, Except, Num) ->
 	Kinds = lists:map(fun(X) -> X#card.kind end, Except),
 	Kickers = lists:filter(fun(X) -> not lists:member(X#card.kind, Kinds) end, Cards),
-	sorted_cards(Kickers, Num).
+	high_cards(Kickers, Num).
 
 %% group cards
 group_cards(_, [], Buf, F) when is_function(F) ->
@@ -104,23 +100,23 @@ group_cards(F, [H|T]) when is_function(F) ->
 %% split result:
 %%  Group1: [A{h,d}, Ks, Q{d,h}, Js, Tc] Group2: [8c] Group3: [2c, 3c, 4d]
 split_rows(Cards) ->
-  Grouped = group_cards(fun(Prev, Next) -> diff_cards(Prev, Next) < 2 end, sorted_cards(Cards)),
-  lists:map(fun(G) -> [First | _] = G, #straight_row{to = First#card.kind, value = G} end, Grouped).
+  Grouped = group_cards(fun(Prev, Next) -> diff_cards(Prev, Next) < 2 end, high_cards(Cards)),
+  lists:map(fun(G) -> [First | _] = G, #card_group{kind = First#card.kind, value = G} end, Grouped).
 
 %% cards with same kind
 group_suits(Cards) ->
   Sorted = lists:keysort(1, lists:map(fun(C) -> {suit_index(C#card.suit), C} end, Cards)),
   Grouped = group_cards(fun(Prev, Next) -> Prev#card.suit == Next#card.suit end, lists:map(fun({_, C}) -> C end, Sorted)),
-  lists:map(fun(G) -> [First | _] = G, #group_suit{suit = First#card.suit, value = G} end, Grouped).
+  lists:map(fun(G) -> [First | _] = G, #card_group{suit = First#card.suit, value = G} end, Grouped).
 
 %% cards with same suit
 group_kinds(Cards) ->
-  Grouped = group_cards(fun(Prev, Next) -> Prev#card.kind == Next#card.kind end, sorted_cards(Cards)),
-  lists:map(fun(G) -> [First | _] = G, #group_kind{kind = First#card.kind, value = G} end, Grouped).
+  Grouped = group_cards(fun(Prev, Next) -> Prev#card.kind == Next#card.kind end, high_cards(Cards)),
+  lists:map(fun(G) -> [First | _] = G, #card_group{kind = First#card.kind, value = G} end, Grouped).
 
 %%
 card_frequency(Cards, Num) ->
-	[Repeat || Repeat <- group_kinds(Cards), erlang:length(Repeat#group_kind.value) == Num].
+	[Repeat || Repeat <- group_kinds(Cards), erlang:length(Repeat#card_group.value) == Num].
 
 %%
 shuffle_cards(Cards) ->
@@ -148,7 +144,7 @@ test_card() ->
 	io:format("~ncard indexes: "),
 	[io:format("~s(~p) ", [Kind, card_index(Kind)]) || Kind <- ?KINDS],
 	io:format("~nsorted cards: "),
-	[io:format("~ts ", [card_to_string(Card)]) || Card <- sorted_cards(parse_cards("Ah7dJcTsKs"))],
+	[io:format("~ts ", [card_to_string(Card)]) || Card <- high_cards(parse_cards("Ah7dJcTsKs"))],
 	io:format("~n"),
 	io:format("card integer of Kd: ~p; card of 28: ~ts~n", [card_to_integer(build_card("K", "d")), card_to_string(build_card(28))]),
 	io:format("~n"),
