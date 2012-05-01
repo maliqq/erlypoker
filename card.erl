@@ -4,6 +4,8 @@
 -define(SUITS, ["s", "h", "d", "c"]).
 -define(KINDS, ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]).
 
+-define(KIND_NAMES, [{"A", "ace"}, {"K", "king"}, {"Q", "queen"}, {"J", "jack"}, {"T", "ten"}, {"9", "nine"}, {"8", "eight"}, {"7", "seven"}, {"6", "six"}, {"5", "five"}, {"4", "four"}, {"3", "three"}, {"2", "deuce"}]).
+
 %% some hardcode
 suit_to_char(Suit) ->
   case Suit of
@@ -22,35 +24,57 @@ suit_index(Suit) ->
     "c" -> 3
   end.
 
+suit_to_string("s") ->
+  "spade";
+suit_to_string("h") ->
+  "heart";
+suit_to_string("d") ->
+  "diamond";
+suit_to_string("c") ->
+  "club".
+
+kind_to_string(Kind) -> {_, Name} = lists:keyfind(Kind, 1, ?KIND_NAMES), Name.
+
 %% new card
-build_card(Kind, Suit) -> #card{kind = Kind, suit = Suit}.
-build_card(N) when is_integer(N) -> build_card(lists:nth(N rem erlang:length(?KINDS), ?KINDS), lists:nth(N div erlang:length(?KINDS) + 1, ?SUITS));
-build_card(String) -> [Kind, Suit] = re:split(String, "", [{return, list}, {parts, 2}]), build_card(Kind, Suit).
+build_card(Kind, Suit) ->
+  #card{kind = Kind, suit = Suit}.
+build_card(N) when is_integer(N) ->
+  build_card(lists:nth(N rem erlang:length(?KINDS), ?KINDS), lists:nth(N div erlang:length(?KINDS) + 1, ?SUITS));
+build_card(String) ->
+  [Kind, Suit] = re:split(String, "", [{return, list}, {parts, 2}]), build_card(Kind, Suit).
 
 %% build cards from string values like "KhJd8s9s2s"
 parse_cards(String) ->
   {_, Result} = re:run(String, "([akqjt2-9]{1})([shdc]{1})", [global, caseless, {capture, [1, 2], list}]),
   lists:map(fun([Kind, Suit]) -> build_card(Kind, Suit) end, Result).
-cards(String) -> parse_cards(String).
+cards(String) ->
+  parse_cards(String).
 
 %% all cards
-cards() -> [build_card(Kind, Suit) || Kind <- ?KINDS, Suit <- ?SUITS].
+cards() ->
+  [build_card(Kind, Suit) || Kind <- ?KINDS, Suit <- ?SUITS].
 
 %%
-card_to_string(Card) when is_record(Card, card) -> io_lib:format("~s~ts", [Card#card.kind, suit_to_char(Card#card.suit)]);
-card_to_string(Card) when is_record(Card, card_group) -> io_lib:format("~s{~ts}", [Card#card_group.kind, string:join(lists:map(fun(C) -> suit_to_char(C#card.suit) end, Card#card_group.value), "")]).
+card_to_string(Card) when is_record(Card, card) ->
+  io_lib:format("~s~ts", [Card#card.kind, suit_to_char(Card#card.suit)]);
+card_to_string(Card) when is_record(Card, card_group) ->
+  io_lib:format("~s{~ts}", [Card#card_group.kind, string:join(lists:map(fun(C) -> suit_to_char(C#card.suit) end, Card#card_group.value), "")]).
 
 %%
-cards_to_string(Cards) -> string:join(lists:map(fun(Card) -> card_to_string(Card) end, Cards), " ").
+cards_to_string(Cards) ->
+  string:join(lists:map(fun(Card) -> card_to_string(Card) end, Cards), " ").
 
 %%
 card_to_integer(Card) ->
   card_index(Card#card.kind) + erlang:length(?KINDS) * suit_index(Card#card.suit).
 
 %%
-card_index(N, _) when is_integer(N) -> N rem erlang:length(?KINDS);
-card_index(Card, Low) when is_record(Card, card) -> card_index(Card#card.kind, Low);
-card_index(Card, Low) when is_record(Card, card_group) -> card_index(Card#card_group.kind, Low);
+card_index(N, _) when is_integer(N) ->
+  N rem erlang:length(?KINDS);
+card_index(Card, Low) when is_record(Card, card) ->
+  card_index(Card#card.kind, Low);
+card_index(Card, Low) when is_record(Card, card_group) ->
+  card_index(Card#card_group.kind, Low);
 card_index(Card, Low) ->
   Kinds = if
     Low -> [Ace | Tail] = ?KINDS, Tail ++ [Ace];
@@ -59,25 +83,35 @@ card_index(Card, Low) ->
   {Map, _} = lists:mapfoldl(fun(X, I) -> {{X, I}, I + 1} end, 1, Kinds),
   {_, Index} = lists:keyfind(Card, 1, Map),
   Index.
-card_index(Card) -> card_index(Card, false).
+card_index(Card) ->
+  card_index(Card, false).
 
 %%
-compare_cards(A, B) -> card_index(A) =< card_index(B).
-compare_cards_low(A, B) -> card_index(B, true) =< card_index(A, true).
+compare_cards(A, B) ->
+  card_index(A) =< card_index(B).
+compare_cards_low(A, B) ->
+  card_index(B, true) =< card_index(A, true).
 
 %%
-diff_cards(A, B) -> erlang:abs(card_index(A) - card_index(B)).
+diff_cards(A, B) ->
+  erlang:abs(card_index(A) - card_index(B)).
 
 %% from A to 2
-high_cards(Cards) -> lists:sort(fun compare_cards/2, Cards).
-high_cards(Cards, N) when is_integer(N) -> lists:sublist(high_cards(Cards), N).
+high_cards(Cards) ->
+  lists:sort(fun compare_cards/2, Cards).
+high_cards(Cards, N) when is_integer(N) ->
+  lists:sublist(high_cards(Cards), N).
 %%
-low_cards(Cards) -> lists:sort(fun compare_cards_low/2, Cards).
-low_cards(Cards, N) when is_integer(N) -> lists:sublist(low_cards(Cards), N).
+low_cards(Cards) ->
+  lists:sort(fun compare_cards_low/2, Cards).
+low_cards(Cards, N) when is_integer(N) ->
+  lists:sublist(low_cards(Cards), N).
 
 %%
-highest_card(Cards) -> [Highest | _] = lists:sort(fun compare_cards/2, Cards), Highest.
-lowest_card(Cards) -> [Lowest | _] = lists:sort(fun compare_cards_low/2, Cards), Lowest.
+highest_card(Cards) ->
+  [Highest | _] = lists:sort(fun compare_cards/2, Cards), Highest.
+lowest_card(Cards) ->
+  [Lowest | _] = lists:sort(fun compare_cards_low/2, Cards), Lowest.
 %%
 kicker_cards(Cards, Except, N) when is_integer(N) ->
   Kinds = lists:map(fun(X) -> X#card.kind end, Except),
@@ -125,7 +159,8 @@ shuffle_cards(Cards) ->
   lists:sort(fun(_, _) -> random:uniform() =< 0.5 end, Cards).
 
 %%
-new_deck() -> shuffle_cards(cards()).
+new_deck() ->
+  shuffle_cards(cards()).
 
 %%
 test_suit() ->

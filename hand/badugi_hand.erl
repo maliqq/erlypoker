@@ -1,18 +1,16 @@
--define(BADUGI1, 0).
--define(BADUGI2, 1).
--define(BADUGI3, 2).
--define(BADUGI4, 3). %% complete badugi card
-
--define(BADUGI, "badugi").
--define(RANK_BADUGI, [{0, "one_card"}, {1, "two_card"}, {2, "three_card"}, {3, "four_card"}]).
+-define(BADUGI1, 9).
+-define(BADUGI2, 10).
+-define(BADUGI3, 11).
+-define(BADUGI4, 12). %% complete badugi card
 
 %%
 is_badugi4(Cards) ->
   case has_rainbow(Cards, 4) of
     true ->
       Highest = highest_card(Cards),
-      #hand{id = "badugi", rank = {?BADUGI4, Highest#card.kind}, value = low_cards(Cards)};
-    _Else -> false
+      #hand{rank = {?BADUGI4, Highest#card.kind}, value = low_cards(Cards)};
+    _Else ->
+      false
   end.
 
 %% 2 cards same suit OR 2 cards same kind
@@ -30,13 +28,15 @@ is_badugi3(Cards) ->
       [Suited | _] = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) == 2],
       Lowest = lowest_card(Suited#card_group.value),
       lists:filter(fun(C) -> C#card.suit /= Lowest#card.suit end, Cards) ++ [Lowest];
-    _Else -> false
+    _Else ->
+      false
   end,
   case Value of
-    false -> false;
+    false ->
+      false;
     _Then ->
       Highest = highest_card(Value),
-      #hand{id = ?BADUGI, rank = {?BADUGI3, Highest#card.kind}, value = low_cards(Value)}
+      #hand{rank = {?BADUGI3, Highest#card.kind}, value = low_cards(Value)}
   end.
 
 %% 3 cards same suit OR 3 cards same kind
@@ -70,13 +70,15 @@ is_badugi2(Cards) ->
       [Pairs | _] = card_frequency(Cards, 2),
       [B | _] = Pairs,
       [A, B];
-    _Else -> false
+    _Else ->
+      false
   end,
   case Value of
-    false -> false;
+    false ->
+      false;
     _Then ->
       Highest = highest_card(Value),
-      #hand{id = ?BADUGI, rank = {?BADUGI2, Highest#card.kind}, value = low_cards(Value)}
+      #hand{rank = {?BADUGI2, Highest#card.kind}, value = low_cards(Value)}
   end.
 
 %% all cards same suit OR all cards same kind
@@ -84,8 +86,9 @@ is_badugi1(Cards) ->
   case has_paired(Cards, 4) or has_suited(Cards, 4) of
     true ->
       Lowest = lowest_card(Cards),
-      #hand{id = ?BADUGI, rank = {?BADUGI1, Lowest#card.kind}, value = Lowest};
-    _Else -> false
+      #hand{rank = {?BADUGI1, Lowest#card.kind}, value = Lowest};
+    _Else ->
+      false
   end.
 
 %%
@@ -113,7 +116,8 @@ has_rainbow(Cards, N) when is_integer(N) ->
 %%
 has_rainbow_paired(Cards) ->
   case erlang:length(group_suits(Cards)) == 4 of
-    true -> false;
+    true ->
+      false;
     _Else ->
       Grouped = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) > 1],
       [A | _] = Grouped,
@@ -121,9 +125,12 @@ has_rainbow_paired(Cards) ->
       A#card_group.kind == B#card.kind
   end.
 %%
-badugi_hand(Cards) when erlang:length(Cards) /= 4 -> throw("badugi hand is exact 4 cards");
-badugi_hand(Cards) -> badugi_hand(Cards, [fun is_badugi4/1, fun is_badugi3/1, fun is_badugi2/1, fun is_badugi1/1]).
-badugi_hand(_, []) -> false;
+badugi_hand(Cards) when erlang:length(Cards) /= 4 ->
+  throw("badugi hand is exact 4 cards");
+badugi_hand(Cards) ->
+  badugi_hand(Cards, [fun is_badugi4/1, fun is_badugi3/1, fun is_badugi2/1, fun is_badugi1/1]).
+badugi_hand(_, []) ->
+  false;
 badugi_hand(Cards, [F|Tail]) when is_function(F) ->
   case F(Cards) of
     false -> badugi_hand(Cards, Tail);
