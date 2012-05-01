@@ -7,21 +7,21 @@
 
 %%
 hand_to_string(Hand) ->
-	case Hand of
-		false -> "[no hand]";
-		_Else ->
-			{N, What} = Hand#hand.rank,
-			Rank = Hand#hand.id,
-			{_, Names, _} = lists:keyfind(Rank, 1, ?RANKS),
-			{_, Name} = lists:keyfind(N, 1, Names),
-			io_lib:format("~s (~s) [~ts]", [Name, What, cards_to_string(Hand#hand.value)])
-	end.
+  case Hand of
+    false -> "[no hand]";
+    _Else ->
+      {N, What} = Hand#hand.rank,
+      Rank = Hand#hand.id,
+      {_, Names, _} = lists:keyfind(Rank, 1, ?RANKS),
+      {_, Name} = lists:keyfind(N, 1, Names),
+      io_lib:format("~s (~s) [~ts]", [Name, What, cards_to_string(Hand#hand.value)])
+  end.
 
 test_hand() ->
-	{_, [[Arg]]} = init:get_argument(cards),
-	Cards = parse_cards(Arg),
-	{_, [[Rank]]} = init:get_argument(rank),
-	{_, _, F} = lists:keyfind(Rank, 1, ?RANKS),
-	Hand = F(Cards),
-	io:format(hand_to_string(Hand)),
-	io:format("~n").
+  {_, [[Arg]]} = init:get_argument(cards),
+  Cards = parse_cards(Arg),
+  {_, [[Rank]]} = init:get_argument(rank),
+  {_, _, F} = lists:keyfind(Rank, 1, ?RANKS),
+  Hand = F(Cards),
+  io:format(hand_to_string(Hand)),
+  io:format("~n").

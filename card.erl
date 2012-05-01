@@ -29,8 +29,8 @@ build_card(String) -> [Kind, Suit] = re:split(String, "", [{return, list}, {part
 
 %% build cards from string values like "KhJd8s9s2s"
 parse_cards(String) ->
-	{_, Result} = re:run(String, "([akqjt2-9]{1})([shdc]{1})", [global, caseless, {capture, [1, 2], list}]),
-	lists:map(fun([Kind, Suit]) -> build_card(Kind, Suit) end, Result).
+  {_, Result} = re:run(String, "([akqjt2-9]{1})([shdc]{1})", [global, caseless, {capture, [1, 2], list}]),
+  lists:map(fun([Kind, Suit]) -> build_card(Kind, Suit) end, Result).
 cards(String) -> parse_cards(String).
 
 %% all cards
@@ -56,9 +56,9 @@ card_index(Card, Low) ->
     Low -> [Ace | Tail] = ?KINDS, Tail ++ [Ace];
     true -> ?KINDS
   end,
-	{Map, _} = lists:mapfoldl(fun(X, I) -> {{X, I}, I + 1} end, 1, Kinds),
-	{_, Index} = lists:keyfind(Card, 1, Map),
-	Index.
+  {Map, _} = lists:mapfoldl(fun(X, I) -> {{X, I}, I + 1} end, 1, Kinds),
+  {_, Index} = lists:keyfind(Card, 1, Map),
+  Index.
 card_index(Card) -> card_index(Card, false).
 
 %%
@@ -79,9 +79,9 @@ highest_card(Cards) -> [Highest | _] = lists:sort(fun compare_cards/2, Cards), H
 lowest_card(Cards) -> [Lowest | _] = lists:sort(fun compare_cards_low/2, Cards), Lowest.
 %%
 kicker_cards(Cards, Except, Num) ->
-	Kinds = lists:map(fun(X) -> X#card.kind end, Except),
-	Kickers = lists:filter(fun(X) -> not lists:member(X#card.kind, Kinds) end, Cards),
-	high_cards(Kickers, Num).
+  Kinds = lists:map(fun(X) -> X#card.kind end, Except),
+  Kickers = lists:filter(fun(X) -> not lists:member(X#card.kind, Kinds) end, Cards),
+  high_cards(Kickers, Num).
 
 %% group cards
 group_cards(_, [], Buf, F) when is_function(F) ->
@@ -116,7 +116,7 @@ group_kinds(Cards) ->
 
 %%
 card_frequency(Cards, Num) ->
-	[Repeat || Repeat <- group_kinds(Cards), erlang:length(Repeat#card_group.value) == Num].
+  [Repeat || Repeat <- group_kinds(Cards), erlang:length(Repeat#card_group.value) == Num].
 
 %%
 shuffle_cards(Cards) ->
@@ -133,27 +133,27 @@ test_suit() ->
 
 %%
 test_kind() ->
-	io:format("all kinds: ~p~n", [?KINDS]).
+  io:format("all kinds: ~p~n", [?KINDS]).
 
 %%
 test_card() ->
   io:format("parsed from string: "),
-	[io:format("~ts ", [card_to_string(Card)]) || Card <- parse_cards("AhJd")],
-	io:format("~nall cards: "),
-	[io:format("~ts ", [card_to_string(Card)]) || Card <- cards()],
-	io:format("~ncard indexes: "),
-	[io:format("~s(~p) ", [Kind, card_index(Kind)]) || Kind <- ?KINDS],
-	io:format("~nsorted cards: "),
-	[io:format("~ts ", [card_to_string(Card)]) || Card <- high_cards(parse_cards("Ah7dJcTsKs"))],
-	io:format("~n"),
-	io:format("card integer of Kd: ~p; card of 28: ~ts~n", [card_to_integer(build_card("K", "d")), card_to_string(build_card(28))]),
-	io:format("~n"),
-	io:format("rows: ~p~n", [split_rows(parse_cards("Ah4sAd2cQdQhTc8cJsKs3c"))]),
-	io:format("suits: ~p~n", [group_suits(parse_cards("Ah4sAd2cQdQhTc8cJsKs3c"))]),
-	io:format("kinds: ~p~n", [group_kinds(parse_cards("Ah4sAd2cQdQhTc8cJsKs3c"))]).
+  [io:format("~ts ", [card_to_string(Card)]) || Card <- parse_cards("AhJd")],
+  io:format("~nall cards: "),
+  [io:format("~ts ", [card_to_string(Card)]) || Card <- cards()],
+  io:format("~ncard indexes: "),
+  [io:format("~s(~p) ", [Kind, card_index(Kind)]) || Kind <- ?KINDS],
+  io:format("~nsorted cards: "),
+  [io:format("~ts ", [card_to_string(Card)]) || Card <- high_cards(parse_cards("Ah7dJcTsKs"))],
+  io:format("~n"),
+  io:format("card integer of Kd: ~p; card of 28: ~ts~n", [card_to_integer(build_card("K", "d")), card_to_string(build_card(28))]),
+  io:format("~n"),
+  io:format("rows: ~p~n", [split_rows(parse_cards("Ah4sAd2cQdQhTc8cJsKs3c"))]),
+  io:format("suits: ~p~n", [group_suits(parse_cards("Ah4sAd2cQdQhTc8cJsKs3c"))]),
+  io:format("kinds: ~p~n", [group_kinds(parse_cards("Ah4sAd2cQdQhTc8cJsKs3c"))]).
 
 %%
 test_deck() ->
-	io:format("random deck: "),
-	[io:format("~ts ", [card_to_string(Card)]) || Card <- new_deck()],
-	io:format("~n").
+  io:format("random deck: "),
+  [io:format("~ts ", [card_to_string(Card)]) || Card <- new_deck()],
+  io:format("~n").
