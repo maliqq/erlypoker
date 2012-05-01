@@ -1,0 +1,1 @@
+-record(player, {name, chips, cards}).

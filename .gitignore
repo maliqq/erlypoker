@@ -1,4 +1,4 @@
-*.swp
-*.dump
 *.beam
+erl_crash.dump
+
 
