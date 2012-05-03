@@ -8,18 +8,18 @@
   }).
 -record(pot, {
     amount = 0, %% amount in the pot
-    current,
+    main,
     side = [] %% side pots, last is main pot
   }).
 
 %% blank pot
 new_side_pot() -> #side_pot{members = orddict:new()}.
-new() -> #pot{current = new_side_pot()}.
+new() -> #pot{main = new_side_pot()}.
 
 to_string(Pot) when is_record(Pot, side_pot) ->
   io_lib:format("(total = ~p cap=~p members = ~p)", [total(Pot), Pot#side_pot.cap, Pot#side_pot.members]);
 to_string(Pot) when is_record(Pot, pot) ->
-  io_lib:format("Total: ~p~n\tCurrent Pot: ~ts~n\tSide pots: ~ts~n", [total(Pot), to_string(Pot#pot.current),
+  io_lib:format("Total: ~p~n\tCurrent Pot: ~ts~n\tSide pots: ~ts~n", [total(Pot), to_string(Pot#pot.main),
     string:join(lists:map(fun(P) -> to_string(P) end, Pot#pot.side), "")
     ]).
 
@@ -43,12 +43,12 @@ total(Pot) when is_record(Pot, pot) ->
   end, 0, side_pots(Pot)).
 
 side_pots(Pot) when is_record(Pot, pot) ->
-  [Pot#pot.current] ++ Pot#pot.side.
+  [Pot#pot.main] ++ Pot#pot.side.
 
 append(P, Member, Amount) when is_record(P, side_pot) ->
   Pot = ensure_member(Member, P),
 
-  %% current bet size
+  %% main bet size
   Value = orddict:fetch(Member, Pot#side_pot.members),
 
   %% max bet size for covering All-in member
@@ -75,7 +75,7 @@ ensure_member(Member, P) when is_record(P, side_pot) ->
   end.
 
 split(Pot, Member) when is_record(Pot, pot) ->
-  Current = Pot#pot.current,
+  Current = Pot#pot.main,
   %%Current = C#side_pot{members = orddict:update_counter(Member, Balance, C#side_pot.members)},
   Value = orddict:fetch(Member, Current#side_pot.members),
 
@@ -98,7 +98,7 @@ split(Pot, Member) when is_record(Pot, pot) ->
     end, Members),
   OldPot = release(Current#side_pot{members = OldMembers, cap = Value}),
 
-  Pot#pot{current = NewPot, side = lists:append(Pot#pot.side, [OldPot])}.
+  Pot#pot{main = NewPot, side = lists:append(Pot#pot.side, [OldPot])}.
 
 append(Pot, Member, Amount, Cap) when is_record(Pot, pot) ->
   {[_|Side], Balance} = lists:mapfoldl(fun(P, B) ->
@@ -109,8 +109,8 @@ append(Pot, Member, Amount, Cap) when is_record(Pot, pot) ->
     end}
   end, Amount, side_pots(Pot)),
   
-  {Appended, _} = append(Pot#pot.current, Member, Balance),
-  P = Pot#pot{current = Appended, side = Side},
+  {Appended, _} = append(Pot#pot.main, Member, Balance),
+  P = Pot#pot{main = Appended, side = Side},
 
   if
     Cap ->
