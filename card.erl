@@ -1,6 +1,6 @@
 -module(card).
 -export([
-    test/0, to_string/1, wrap/1,
+    test/0, to_string/1, wrap/1, deck/0,
     group_kinds/1, group_suits/1, all/0, shuffle/1, pack/1, suit_to_string/1, kind_to_string/1,
     arrange/1, arrange/2, arrange_low/1, arrange_low/2,
     highest/1, lowest/1, kickers/3, freq/2
@@ -169,6 +169,10 @@ all() ->
 shuffle(Cards) ->
   random:seed(erlang:now()),
   lists:sort(fun(_, _) -> random:uniform() =< 0.5 end, Cards).
+
+%%
+deck() ->
+  shuffle(all()).
 
 %%
 test_suit() ->

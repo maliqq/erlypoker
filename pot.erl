@@ -1,5 +1,5 @@
 -module(pot).
--export([test/0]).
+-export([test/0, new/0]).
 
 -record(side_pot, {
     amount = 0,

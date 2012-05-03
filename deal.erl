@@ -1,31 +1,43 @@
+-module(deal).
+-export([test/0, new/0, burn/2, discard/2, hole/2, board/2, vela/1]).
+
 -record(deal, {
     deck,
+    board = [],
+    burned = [],
     pot,
-    hands
+    hands = []
   }).
 
 %%
-new_deck() ->
-  card:shuffle(card:all()).
 
-reshuffle_deck(_) -> ok.
+new() ->
+  #deal{deck = card:deck(), pot = pot:new()}.
 
-deal_discarding_cards() -> ok.
+grant(Deal, Num) ->
+  lists:sublits(Deal#deal.deck, 1, Num).
 
-deal_hole_cards() -> ok.
+burn(Deal, Num) ->
+  Burned = grant(Deal, Num),
+  {Deal#deal{deck = Deal#deal.deck -- Burned, burned = Deal#deal.burned ++ Burned}, Burned}.
 
-deal_community_cards() -> ok.
+discard(Deal, Cards) ->
+  New = grant(Deal, erlang:length(Cards)),
+  {Deal#deal{deck = Deal#deal.deck -- New, burned = Deal#deal.burned ++ New}, New}.
 
-showdown_cards() -> ok.
+hole(Deal, Num) ->
+  Cards = grant(Deal, Num),
+  {Deal#deal{deck = Deal#deal.deck -- Cards}, Cards}.
 
-post_blinds() -> ok.
+board(Deal, Num) ->
+  Cards = grant(Deal, Num),
+  {Deal#deal{board = Deal#deal.board ++ Cards}, Cards}.
 
-post_antes() -> ok.
-
-new_deal(_, _) -> ok.
+vela(Deal) ->
+  board(Deal, 1).
 
 %%
-test_deck() ->
+test() ->
   io:format("random deck: "),
-  [io:format("~ts ", [card:to_string(Card)]) || Card <- new_deck()],
+  [io:format("~ts ", [card:to_string(Card)]) || Card <- card:deck()],
   io:format("~n").
