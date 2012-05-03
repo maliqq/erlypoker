@@ -5,7 +5,15 @@
     amount,
     call = false,
     fold = false,
+    all_in = false,
     forced = false
+  }).
+
+-record(context, {
+    table,
+    actor,
+    action,
+    stage
   }).
 
 -define(SUITS, ["s", "h", "d", "c"]).
