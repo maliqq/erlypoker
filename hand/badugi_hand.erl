@@ -7,8 +7,8 @@
 is_badugi4(Cards) ->
   case has_rainbow(Cards, 4) of
     true ->
-      Highest = highest_card(Cards),
-      #hand{rank = {?BADUGI4, Highest#card.kind}, value = low_cards(Cards)};
+      Highest = card:highest(Cards),
+      #hand{rank = {?BADUGI4, Highest#card.kind}, value = card:arrange_low(Cards)};
     _Else ->
       false
   end.
@@ -21,12 +21,12 @@ is_badugi3(Cards) ->
       has_suited(Cards, 2) and not_paired(Cards)
   } of
     {true, _} -> %% AsAhJd3c
-      [Paired | _] = [Group || Group <- group_kinds(Cards), erlang:length(Group#card_group.value) == 2],
+      [Paired | _] = [Group || Group <- card:group_kinds(Cards), erlang:length(Group#card_group.value) == 2],
       [A | _] = Paired#card_group.value,
       lists:filter(fun(C) -> C#card.kind /= A#card.kind end, Cards) ++ [A];
     {_, true} -> %% AsJs2d3c
-      [Suited | _] = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) == 2],
-      Lowest = lowest_card(Suited#card_group.value),
+      [Suited | _] = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) == 2],
+      Lowest = card:lowest(Suited#card_group.value),
       lists:filter(fun(C) -> C#card.suit /= Lowest#card.suit end, Cards) ++ [Lowest];
     _Else ->
       false
@@ -35,8 +35,8 @@ is_badugi3(Cards) ->
     false ->
       false;
     _Then ->
-      Highest = highest_card(Value),
-      #hand{rank = {?BADUGI3, Highest#card.kind}, value = low_cards(Value)}
+      Highest = card:highest(Value),
+      #hand{rank = {?BADUGI3, Highest#card.kind}, value = card:arrange_low(Value)}
   end.
 
 %% 3 cards same suit OR 3 cards same kind
@@ -50,24 +50,24 @@ is_badugi2(Cards) ->
       has_rainbow(Cards, 3) and has_rainbow_paired(Cards)
   } of
     {true, _, _, _} -> %% 2s2h2dAc
-      [ThreeKind | _] = card_frequency(Cards, 3),
+      [ThreeKind | _] = card:freq(Cards, 3),
       [A | _] = lists:filter(fun(C) -> C#card.kind /= ThreeKind#card_group.kind end, Cards),
       [B | _] = lists:filter(fun(C) -> C#card.suit /= A#card.suit end, ThreeKind#card_group.value),
       [A, B];
     {_, true, _, _} -> %% 3d4d5dAc
-      [Flush | _] = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) == 3],
+      [Flush | _] = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) == 3],
       [A | _] = lists:filter(fun(C) -> C#card.suit /= Flush#card_group.suit end, Cards),
       [B | _] = lists:filter(fun(C) -> C#card.kind /= A#card.kind end, Flush#card_group.value),
       [A, B];
     {_, _, true, _} ->
-      [Flush | _] = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) == 2],
+      [Flush | _] = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) == 2],
       [A | _] = Flush,
       [B | _] = lists:filter(fun(C) -> (C#card.kind /= A#card.kind) and (C#card.suit /= A#card.suit) end, Cards),
       [A, B];
     {_, _, _, true} ->
-      [Flush | _] = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) == 2],
+      [Flush | _] = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) == 2],
       [A | _] = Flush,
-      [Pairs | _] = card_frequency(Cards, 2),
+      [Pairs | _] = card:freq(Cards, 2),
       [B | _] = Pairs,
       [A, B];
     _Else ->
@@ -77,15 +77,15 @@ is_badugi2(Cards) ->
     false ->
       false;
     _Then ->
-      Highest = highest_card(Value),
-      #hand{rank = {?BADUGI2, Highest#card.kind}, value = low_cards(Value)}
+      Highest = card:highest(Value),
+      #hand{rank = {?BADUGI2, Highest#card.kind}, value = card:arrange_low(Value)}
   end.
 
 %% all cards same suit OR all cards same kind
 is_badugi1(Cards) ->
   case has_paired(Cards, 4) or has_suited(Cards, 4) of
     true ->
-      Lowest = lowest_card(Cards),
+      Lowest = card:lowest(Cards),
       #hand{rank = {?BADUGI1, Lowest#card.kind}, value = Lowest};
     _Else ->
       false
@@ -93,33 +93,33 @@ is_badugi1(Cards) ->
 
 %%
 has_paired(Cards, N) when is_integer(N) ->
-  Grouped = [Group || Group <- group_kinds(Cards), erlang:length(Group#card_group.value) == N],
+  Grouped = [Group || Group <- card:group_kinds(Cards), erlang:length(Group#card_group.value) == N],
   erlang:length(Grouped) == 1.
 
 %%
 has_suited(Cards, N) ->
-  Grouped = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) == N],
+  Grouped = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) == N],
   erlang:length(Grouped) == 1.
 
 %%
 not_paired(Cards) ->
-  Grouped = [Group || Group <- group_kinds(Cards), erlang:length(Group#card_group.value) > 1],
+  Grouped = [Group || Group <- card:group_kinds(Cards), erlang:length(Group#card_group.value) > 1],
   erlang:length(Grouped) == 0.
 %%
 not_suited(Cards) ->
-  Grouped = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) > 1],
+  Grouped = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) > 1],
   erlang:length(Grouped) == 0.
 
 %% all different kind and suit
 has_rainbow(Cards, N) when is_integer(N) ->
-  (erlang:length(group_kinds(Cards)) == N) and (erlang:length(group_suits(Cards)) == N).
+  (erlang:length(card:group_kinds(Cards)) == N) and (erlang:length(card:group_suits(Cards)) == N).
 %%
 has_rainbow_paired(Cards) ->
-  case erlang:length(group_suits(Cards)) == 4 of
+  case erlang:length(card:group_suits(Cards)) == 4 of
     true ->
       false;
     _Else ->
-      Grouped = [Group || Group <- group_suits(Cards), erlang:length(Group#card_group.value) > 1],
+      Grouped = [Group || Group <- card:group_suits(Cards), erlang:length(Group#card_group.value) > 1],
       [A | _] = Grouped,
       [B | _] = lists:filter(fun(C) -> C#card.suit /= A#card_group.suit end, Cards),
       A#card_group.kind == B#card.kind
@@ -138,4 +138,4 @@ badugi_hand(Cards, [F|Tail]) when is_function(F) ->
   end.
 
 test_badugi_hand() ->
-  io:format("~p", [badugi_hand(cards("2d3c4s4s"))]).
+  io:format("~ts~n", [to_string(badugi_hand(card:wrap("2d3c4s4s")))]).

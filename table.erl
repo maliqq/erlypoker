@@ -3,9 +3,6 @@
 -define(AWAY, 2). %% disconnected
 -define(ACTIVE, 3). %% active
 
--include("game.erl").
--include("deal.erl").
-
 -record(table, {
 		id,
 	  game, %% Texas Holdem No Limit
@@ -29,6 +26,10 @@
 		cards,
 		timer
 	}).
+
+-include("game.erl").
+-include("deal.erl").
+-include("bet.erl").
 
 new_table(Game, BigBlind) when is_integer(BigBlind) ->
 	#table{
@@ -57,21 +58,24 @@ cycled_position(N, Max) ->
 			N
 	end.
 
-is_before_button(Table, Player) ->
+is_after_button(Table, Player) ->
 	Button = Table#table.button,
 	Max = Table#table.max,
 	{Seat, _} = lists:keyfind(Player#player.id, 2, Table#table.seats),
 	Middle = cycled_position(Button + Max div 2, Max),
 	SeatN = cycled_position(Seat + Max div 2, Max),
 	if
-		SeatN =< Middle -> true;
-		SeatN > Middle -> false
+		SeatN =< Middle -> false;
+		SeatN > Middle -> true
 	end.
 
+players_with_state(Table, State) ->
+	[Player || {_, Player} <- Table#table.players, Player#player.state == State].
+
 activate_waiting(Table) when is_record(Table, table) ->
-	Waiting = [Player || {_, Player} <- Table#table.players, Player#player.state == ?WAITING],
+	Waiting = players_with_state(Table, ?WAITING),
 	lists:foldl(fun(P, T) ->
-		case is_before_button(T, P) of
+		case is_after_button(T, P) of
 			true ->
 				change_player_state(T, P, ?ACTIVE);
 			_Else ->
@@ -80,7 +84,7 @@ activate_waiting(Table) when is_record(Table, table) ->
 	end, Table, Waiting).
 
 can_deal(Table) when is_record(Table, table) ->
-	ActivePlayers = [Player || {_, Player} <- Table#table.players, Player#player.state == ?ACTIVE],
+	ActivePlayers = players_with_state(Table, ?ACTIVE),
 	erlang:length(ActivePlayers) > 1 andalso ActivePlayers.
 
 start_deal(Table) ->
@@ -118,8 +122,11 @@ add_player(Table, Seat, Player) when is_record(Table, table), is_record(Player, 
 test_table() ->
 	G = new_game(?TEXAS, ?HOLDEM, ?NO_LIMIT),
 	T = new_table(G, 100),
+	
 	P1 = new_player("malik", 10000),
 	P2 = new_player("kairat", 10000),
+	
 	T2 = add_player(T, 1, P1),
 	T3 = add_player(T2, 2, P2),
+
 	start_deal(T3).

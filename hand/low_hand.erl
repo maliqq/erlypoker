@@ -2,17 +2,21 @@
 -define(DEUCE7, 14).
 -define(ACE6, 15).
 
+%% A-2-3-4-5
+%% any low cards; repeats are ignored
 ace5_low(Cards) ->
-  Groups = group_kinds(Cards),
+  Groups = card:group_kinds(Cards),
   if
     erlang:length(Groups) >= 5 ->
-      Value = low_cards(Groups, 5),
+      Value = card:arrange_low(Groups, 5),
       #hand{rank={?ACE5}, value = Value};
     true -> false
   end.
 
+%% 4-5-6-7-8
+%% any low cards with 8 qualifier; repeats are ignored
 ace5_low8(Cards) ->
-  Low8 = lists:filter(fun(C) -> card_index(C#card.kind, true) >= card_index("8", true) end, Cards),
+  Low8 = lists:filter(fun(C) -> card:index(C#card.kind, true) >= card:index("8", true) end, Cards),
   Hand = ace5_low(Low8),
   if
     Hand == false ->
@@ -21,11 +25,15 @@ ace5_low8(Cards) ->
       Hand#hand{rank={?ACE5}}
   end.
 
+%% A-2-3-4-6
+%% 5 card rows with one gap, ace is low card; straights, repeats and flushes are ignored
 ace6_low(_) -> ok.
 
+%% 2-3-4-5-7
+%% 5 card rows with one gap, eq: 23467, 23567, 24567, 34568; straights, repeats and flushes are ignored
 deuce7_low(Cards) when erlang:length(Cards) /= 5 -> throw("2-7 ranking allows 5 cards only");
 deuce7_low(Cards) ->
-  Hand = high_card(Cards),
+  Hand = card:arrange(Cards),
   {Rank, _} = Hand,
   case Rank of
     ?HIGH_CARD ->
@@ -33,3 +41,6 @@ deuce7_low(Cards) ->
     _Else ->
       Hand
   end.
+
+test_low_hand() ->
+  ok.
