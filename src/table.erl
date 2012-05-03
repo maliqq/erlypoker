@@ -1,7 +1,12 @@
--define(WAITING, 0). %% waiting next deal
--define(IDLE, 1). %% sit out
--define(AWAY, 2). %% disconnected
--define(ACTIVE, 3). %% active
+%% player states
+-define(WAITING, 1). %% waiting next deal
+-define(IDLE, 2). %% sit out
+-define(AWAY, 3). %% disconnected
+-define(ACTIVE, 4). %% active
+
+%% table types
+-define(NORMAL, 1). %% cash game
+-define(BATTLE, 2). %% tournament mode (post blinds when sit out)
 
 -record(table, {
 		id,
