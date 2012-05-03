@@ -1,5 +1,5 @@
 -module(pot).
--export([test/0, new/0]).
+-export([test/0, new/0, erase/2, append/3]).
 
 -record(side_pot, {
     amount = 0,
@@ -44,6 +44,8 @@ total(Pot) when is_record(Pot, pot) ->
 
 side_pots(Pot) when is_record(Pot, pot) ->
   [Pot#pot.main] ++ Pot#pot.side.
+
+erase(Pot, Member) -> ok.
 
 append(P, Member, Amount) when is_record(P, side_pot) ->
   Pot = ensure_member(Member, P),
