@@ -1,8 +1,13 @@
+-module(table).
+
 %% player states
--define(WAITING, 1). %% waiting next deal
+-define(WAIT, 1). %% waiting next deal or BB
 -define(IDLE, 2). %% sit out
 -define(AWAY, 3). %% disconnected
--define(ACTIVE, 4). %% active
+-define(FOLD, 4). %% folded hand
+-define(PLAY, 5). %% currently in deal
+
+-define(ACTIVE, ?FOLD bor ?PLAY). %% active
 
 %% table types
 -define(NORMAL, 1). %% cash game
@@ -10,40 +15,42 @@
 
 -record(table, {
 		id,
+	  
 	  game, %% Texas Holdem No Limit
 	  type,
+	  
 	  state,
+	  
 	  blinds, %% 50/100
 	  ante = 0,
 	  bring_in = 0,
+	  
 	  seats = [],
+	  
 	  players = [], %%
+	  waiting = [], %%
+
 	  max = 9,
+	  
 	  button = 1, %% current button position
-	  current
+	  
+	  current %% current deal
   }).
 
 -record(player, {
 		id,
-		name,
-		state,
-		chips,
-		cards,
-		timer
+		name
 	}).
 
 -include("game.erl").
 -include("deal.erl").
 -include("bet.erl").
 
-new_table(Game, BigBlind) when is_integer(BigBlind) ->
+new(Game, BigBlind) when is_integer(BigBlind) ->
 	#table{
 		game = Game,
 		blinds = [BigBlind div 2, BigBlind]
 	}.
-
-new_player(Name, Chips) ->
-	#player{name = Name, chips = Chips}.
 
 change_player_state(Table, Player, State) when is_record(Table, table), is_record(Player, player) ->
 	case lists:keyfind(Player#player.id, 1, Table#table.players) of
@@ -92,12 +99,12 @@ can_deal(Table) when is_record(Table, table) ->
 	ActivePlayers = players_with_state(Table, ?ACTIVE),
 	erlang:length(ActivePlayers) > 1 andalso ActivePlayers.
 
-start_deal(Table) ->
+deal(Table) ->
 	case can_deal(Table) of
 		false -> false;
 		ActivePlayers ->
 			T = activate_waiting(move_button(Table)),
-			Deal = new_deal(T#table.game, ActivePlayers),
+			Deal = deal:new(T#table.game, ActivePlayers),
 			T#table{current = Deal}
 	end.
 
@@ -106,10 +113,10 @@ move_button(Table) when is_record(Table, table) ->
   NewPosition = Table#table.button + 1,
 	Table#table{button = cycled_position(NewPosition, Table#table.max)}.
 
-add_player(Table, Player) when is_record(Table, table), is_record(Player, player) ->
+sit(Table, Player) when is_record(Table, table), is_record(Player, player) ->
 	Table#table{players = lists:append({Player#player.id, Player}, Table#table.players)}.
 
-add_player(Table, Seat, Player) when is_record(Table, table), is_record(Player, player) ->
+sit(Table, Seat, Player) when is_record(Table, table), is_record(Player, player) ->
 	if
 		erlang:length(Table#table.seats) + 1 > Table#table.max ->
 			throw("all seats are busy");
@@ -125,13 +132,13 @@ add_player(Table, Seat, Player) when is_record(Table, table), is_record(Player, 
 	end.
 
 test_table() ->
-	G = new_game(?TEXAS, ?HOLDEM, ?NO_LIMIT),
-	T = new_table(G, 100),
+	G = game:new(?TEXAS, ?NO_LIMIT),
+	T = new(G, 100),
 	
-	P1 = new_player("malik", 10000),
-	P2 = new_player("kairat", 10000),
-	
-	T2 = add_player(T, 1, P1),
-	T3 = add_player(T2, 2, P2),
+	P1 = #player{id = 9999, name = "malik"},
+	P2 = #player{id = 8888, name = "kairat"},
 
-	start_deal(T3).
+	T1 = sit(T, 1, P1, 10000),
+	T2 = sit(T1, 2, P2, 10000),
+
+	deal(T2).

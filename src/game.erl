@@ -1,18 +1,12 @@
 -module(game).
 -record(game, {id, type, limit}).
-
-%% types
--define(HOLDEM, 1). %% community cards poker
--define(SEVEN_CARD, 2). %% 7 card poker
--define(DRAW, 3). %% draw poker
--define(MIX, 4). %% draw poker
+-export([new/2, mix/1, stages/1, globals/0, defaults/1, options/1]).
 
 %% limits
 -define(NO_LIMIT, 1). %% NL
 -define(POT_LIMIT, 2). %% PL
 -define(FIXED_LIMIT, 3). %% FL
 
-%% games
 %% holdem
 -define(TEXAS, 1).
 -define(OMAHA, 2).
@@ -23,7 +17,7 @@
 -define(RAZZ, 6).
 -define(LONDON, 7).
 %% draw
--define(FIVE_CARD, 8).
+-define(CARD5, 8).
 -define(SINGLE27, 9).
 -define(TRIPLE27, 10).
 -define(BADUGI, 11).
@@ -36,10 +30,16 @@
 -define(MIXED_HOLDEM, 17).
 -define(MIXED_STUD, 18).
 -define(MIXED_DRAW, 19).
+%% type groups
+-define(HOLDEM, ?TEXAS bor ?OMAHA bor ?OMAHA8). %% holdem poker
+-define(CARD7, ?STUD bor ?STUD8 bor ?RAZZ bor ?LONDON). %% 7 card poker
+-define(DRAW, ?CARD5 bor ?SINGLE27 bor ?TRIPLE27 bor ?BADUGI). %% draw poker
+-define(MIX, ?HORSE bor ?HOSE bor ?MIX7 bor ?MIX8 bor ?MIXED_HOLDEM bor ?MIXED_STUD bor ?MIXED_DRAW). %% mixed poker
 
-%% new_game(?TEXAS, ?HOLDEM, ?NO_LIMIT).
+%% new_game(?TEXAS, ?NO_LIMIT).
 new(Type, Limit) -> #game{type = Type, limit = Limit}.
 
+%% mixed game options
 mix(Type) when Type == ?HORSE ->
   {[?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8], ?FIXED_LIMIT};
 mix(Type) when Type == ?HOSE ->
@@ -50,7 +50,7 @@ mix(Type) when Type == ?MIX8 -> %% 8-game
     {?HOLDEM, ?NO_LIMIT},
     {?OMAHA, ?POT_LIMIT}
   ];
-mix(Type) when Type = ?MIX9 ->
+mix(Type) when Type == ?MIX9 ->
   [
     {[?BADUGI, ?TRIPLE27, ?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8], ?FIXED_LIMIT},
     {?HOLDEM, ?NO_LIMIT},
@@ -61,10 +61,11 @@ mix(Type) when Type == ?MIXED_HOLDEM ->
 mix(Type) when Type == ?MIXED_STUD ->
   {[?STUD, ?STUD8, ?RAZZ], ?FIXED_LIMIT};
 mix(Type) when Type == ?MIX7 ->
-  {[?STUD, ?STUD8, ?RAZZ, ?LONDON], ?FIXED_LIMIT},
+  {[?STUD, ?STUD8, ?RAZZ, ?LONDON], ?FIXED_LIMIT};
 mix(Type) when Type == ?MIXED_DRAW ->
-  {[?BADUGI, ?FIVE_CARD, ?SINGLE27, ?TRIPLE27], ?FIXED_LIMIT}.
+  {[?BADUGI, ?CARD5, ?SINGLE27, ?TRIPLE27], ?FIXED_LIMIT}.
 
+%% global options for all game types
 globals() ->
   [
     {cap, 4},
@@ -73,7 +74,9 @@ globals() ->
     {ante, 0.125},
     {bring_in, 0.25}
   ].
-stages(Game) when Game#game.type == ?HOLDEM ->
+
+%% games stages for specified game type
+stages(Type) when Type band ?HOLDEM == ?HOLDEM ->
   [
     antes,
     blinds,
@@ -83,7 +86,7 @@ stages(Game) when Game#game.type == ?HOLDEM ->
     {street, "river", [{deal, 1, board}, bets]},
     showdown
   ];
-stages(Game) when Game#game.type == ?SEVEN_CARD ->
+stages(Type) when Type band ?CARD7 == ?CARD7 ->
   [
     antes,
     {street, "3rd", [{deal, 2, hole}, {deal, 1, door}, bring_in, bets]},
@@ -94,7 +97,7 @@ stages(Game) when Game#game.type == ?SEVEN_CARD ->
     {street, "7th", [{deal, 1, hole}, bets]},
     showdown
   ];
-stages(Game) when Game#game.type == ?DRAW ->
+stages(Type) when Type band ?DRAW == ?DRAW ->
   [
     antes,
     blinds,
@@ -102,7 +105,9 @@ stages(Game) when Game#game.type == ?DRAW ->
     {streets, [discards, bets]},
     showdown
   ].
-defaults(Game) when Game#game.type == ?SEVEN_CARD ->
+
+%% game default options for specific game type
+defaults(Type) when Type band ?CARD7 == ?CARD7 ->
   [
     {vela, true}, %% 1 card board
     {hole_cards, 7},
@@ -112,71 +117,73 @@ defaults(Game) when Game#game.type == ?SEVEN_CARD ->
     {big_bets, true},
     {table_max, 8}
   ];
-defaults(Game) when Game#game.type == ?HOLDEM ->
+defaults(Type) when Type band ?HOLDEM == ?HOLDEM ->
   [
     {board, true},
     {table_max, 10}
   ];
-defaults(Game) when Game#game.type == ?DRAW ->
+defaults(Type) when Type band ?DRAW == ?DRAW ->
   [
     {discards, true},
     {limit, ?FIXED_LIMIT},
     {table_max, 6},
     {reshuffle, true}
   ].
-options(Game) when Game#game.type == ?TEXAS ->
+
+%% game options for specific game type
+options(Type) when Type == ?TEXAS ->
   [
     {ranking, fun hand:high_card/1},
     {hole_cards, 2}
   ];
-options(Game) when Game#game.type == ?OMAHA ->
+options(Type) when Type == ?OMAHA ->
   [
     {ranking, fun hand:high_card/1},
     {hole_cards, 4},
     {limit, ?POT_LIMIT}
   ];
-options(Game) when Game#game.type == ?OMAHA8 ->
+options(Type) when Type == ?OMAHA8 ->
   [
     {ranking, fun hand:high_card/1},
     {ranking, fun hand:ace5_low8/1},
     {hole_cards, 4},
     {limit, ?POT_LIMIT}
   ];
-options(Game) when Game#game.type == ?STUD ->
+options(Type) when Type == ?STUD ->
   [
     {ranking, fun hand:high_card/1}
   ];
-options(Game) when Game#game.type == ?STUD8 ->
+options(Type) when Type == ?STUD8 ->
   [
     {ranking, fun hand:high_card/1},
     {ranking, fun hand:ace5_low8/1}
   ];
-options(Game) when Game#game.type == ?RAZZ ->
+options(Type) when Type == ?RAZZ ->
   [
     {ranking, fun hand:ace5_low/1}
   ];
-options(Game) when Game#game.type == ?LONDON ->
+options(Type) when Type == ?LONDON ->
   [
     {ranking, fun hand:ace6_low/1}
   ];
-options(Game) when Game#game.type == ?FIVE_CARD ->
+options(Type) when Type == ?CARD5 ->
   [
     {ranking, fun hand:high_card/1},
     {hole_cards, 5}
   ];
-options(Game) when Game#game.type == ?SINGLE27 ->
+options(Type) when Type == ?SINGLE27 ->
   [
     {ranking, fun hand:deuce7_low/1},
     {hole_cards, 5},
     {streets, 1}
   ];
-options(Game) when Game#game.type == ?TRIPLE27 ->
+options(Type) when Type == ?TRIPLE27 ->
   [
     {ranking, fun hand:deuce7_low/1},
     {hole_cards, 5},
     {streets, 3}
   ];
-options(Game) when Game#game.type == ?BADUGI ->
+options(Type) when Type == ?BADUGI ->
   [
     {ranking, fun hand:badugi_hand/1},
     {hole_cards, 4},

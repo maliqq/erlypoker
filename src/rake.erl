@@ -1,7 +1,7 @@
 -module(rake).
 -export([test/0, rake/2, rake/3]).
 
-rnd(Rake) -> erlang:trunc(Rake * 100) / 100.
+rake(Rake) -> erlang:trunc(Rake * 100) / 100.
 
 rake(Amount, Percentage, Range) when is_tuple(Range) ->
   {Min, Max} = Range,
@@ -12,7 +12,7 @@ rake(Amount, Percentage, Range) when is_tuple(Range) ->
     Rake > Max ->
       Max;
     true ->
-      rnd(Rake)
+      rake(Rake)
   end;
 
 rake(Amount, Percentage, Max) ->

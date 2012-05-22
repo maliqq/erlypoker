@@ -41,7 +41,7 @@ is_straight_flush(Cards) ->
 	  	high_card(Cards, [fun is_four_kind/1, fun is_full_house/1, fun is_straight/1]); %% skip flush
 	  Flush ->
 	    case is_straight(Flush#hand.value) of
-	      false -> high_card(Cards, [fun is_four_kind/1, fun is_full_house/1, fun is_flush/1, fun is_straight/1]);
+	      false -> high_card(Cards, [fun is_four_kind/1, fun is_full_house/1]); %% skip straight & flush
 	      Straight ->
 	        {_, Kind} = Straight#hand.rank, {_, Suit} = Flush#hand.rank,
 	        #hand{rank = {?STRAIGHT_FLUSH, Kind}, value = Flush#hand.value, high = card:new(Kind, Suit)}
