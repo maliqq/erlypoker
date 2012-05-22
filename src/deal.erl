@@ -18,7 +18,7 @@ new() ->
 
 %%
 draw(Deal, Num) when is_record(Deal, deal) ->
-  lists:sublits(Deal#deal.deck, 1, Num).
+  lists:sublist(Deal#deal.deck, 1, Num).
 
 %%
 burn(Deal, Num) when is_record(Deal, deal) ->
