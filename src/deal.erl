@@ -29,7 +29,8 @@ burn(Deal, Num) when is_record(Deal, deal) ->
 discard(Deal, Cards) when is_record(Deal, deal) ->
   New = draw(Deal, erlang:length(Cards)),
   {Deal#deal{deck = Deal#deal.deck -- New, burned = Deal#deal.burned ++ New}, New}.
-discard(Deal, Player, Cards) -> ok.
+discard(Deal, Player, Cards) ->
+  ok.
 
 %%
 hole(Deal, Num) when is_record(Deal, deal) ->
