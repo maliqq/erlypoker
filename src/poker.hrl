@@ -1,3 +1,4 @@
+%%
 -record(card, {kind, suit}).
 -record(card_group, {kind = none, suit = none, value}).
 

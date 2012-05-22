@@ -1,12 +1,10 @@
-%% player states
--define(WAITING, 1). %% waiting next deal
--define(IDLE, 2). %% sit out
--define(AWAY, 3). %% disconnected
--define(ACTIVE, 4). %% active
+%%
+-module(table).
 
 %% table types
 -define(NORMAL, 1). %% cash game
--define(BATTLE, 2). %% tournament mode (post blinds when sit out)
+-define(RANDOM, 2). %% random game
+-define(BATTLE, 3). %% tournament game
 
 -record(table, {
 		id,
@@ -23,37 +21,9 @@
 	  current
   }).
 
--record(player, {
-		id,
-		name,
-		state,
-		chips,
-		cards,
-		timer
-	}).
-
 -include("game.erl").
 -include("deal.erl").
 -include("bet.erl").
-
-new_table(Game, BigBlind) when is_integer(BigBlind) ->
-	#table{
-		game = Game,
-		blinds = [BigBlind div 2, BigBlind]
-	}.
-
-new_player(Name, Chips) ->
-	#player{name = Name, chips = Chips}.
-
-change_player_state(Table, Player, State) when is_record(Table, table), is_record(Player, player) ->
-	case lists:keyfind(Player#player.id, 1, Table#table.players) of
-		{_, Player} ->
-			ChangedPlayer = Player#player{state = State},
-			Players = lists:keyreplace(Player#player.id, 1, Table#table.players, {Player#player.id, ChangedPlayer}),
-			Table#table{players = Players};
-		_Else ->
-			Table
-	end.
 
 cycled_position(N, Max) ->
 	if
@@ -63,75 +33,13 @@ cycled_position(N, Max) ->
 			N
 	end.
 
-is_after_button(Table, Player) ->
+is_after_button(Table, Seat) ->
 	Button = Table#table.button,
 	Max = Table#table.max,
-	{Seat, _} = lists:keyfind(Player#player.id, 2, Table#table.seats),
 	Middle = cycled_position(Button + Max div 2, Max),
-	SeatN = cycled_position(Seat + Max div 2, Max),
-	if
-		SeatN =< Middle -> false;
-		SeatN > Middle -> true
-	end.
-
-players_with_state(Table, State) ->
-	[Player || {_, Player} <- Table#table.players, Player#player.state == State].
-
-activate_waiting(Table) when is_record(Table, table) ->
-	Waiting = players_with_state(Table, ?WAITING),
-	lists:foldl(fun(P, T) ->
-		case is_after_button(T, P) of
-			true ->
-				change_player_state(T, P, ?ACTIVE);
-			_Else ->
-				T
-		end
-	end, Table, Waiting).
-
-can_deal(Table) when is_record(Table, table) ->
-	ActivePlayers = players_with_state(Table, ?ACTIVE),
-	erlang:length(ActivePlayers) > 1 andalso ActivePlayers.
-
-start_deal(Table) ->
-	case can_deal(Table) of
-		false -> false;
-		ActivePlayers ->
-			T = activate_waiting(move_button(Table)),
-			Deal = new_deal(T#table.game, ActivePlayers),
-			T#table{current = Deal}
-	end.
+	Opposite = cycled_position(Seat + Max div 2, Max),
+	Opposite > Middle.
 
 %% cyclic increment #table.button
 move_button(Table) when is_record(Table, table) ->
-  NewPosition = Table#table.button + 1,
-	Table#table{button = cycled_position(NewPosition, Table#table.max)}.
-
-add_player(Table, Player) when is_record(Table, table), is_record(Player, player) ->
-	Table#table{players = lists:append({Player#player.id, Player}, Table#table.players)}.
-
-add_player(Table, Seat, Player) when is_record(Table, table), is_record(Player, player) ->
-	if
-		erlang:length(Table#table.seats) + 1 > Table#table.max ->
-			throw("all seats are busy");
-		true ->
-			case lists:keyfind(Seat, 1, Table#table.seats) of
-				false ->
-					Waiting = Player#player{state = ?WAITING},
-					T = add_player(Table, Waiting),
-					T#table{seats = lists:append({Seat, Player#player.id}, T#table.seats)};
-				{_, _} ->
-					throw("this seat is busy")
-			end
-	end.
-
-test_table() ->
-	G = new_game(?TEXAS, ?HOLDEM, ?NO_LIMIT),
-	T = new_table(G, 100),
-	
-	P1 = new_player("malik", 10000),
-	P2 = new_player("kairat", 10000),
-	
-	T2 = add_player(T, 1, P1),
-	T3 = add_player(T2, 2, P2),
-
-	start_deal(T3).
+	Table#table{button = cycled_position(Table#table.button + 1, Table#table.max)}.
