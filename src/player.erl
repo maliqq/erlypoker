@@ -1,10 +1,5 @@
 -module(player).
 
--record(player, {
-    id,
-    name
-  }).
-
 %% player states
 -define(WAIT, 1). %% waiting next deal or BB
 -define(IDLE, 2). %% sit out

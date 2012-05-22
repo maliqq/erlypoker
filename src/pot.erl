@@ -1,12 +1,13 @@
 %% pot manipulations - append, split
 -module(pot).
--export([test/0, new/0, erase/2, append/3]).
+-export([test/0, new/0, append/3, is_active/1]).
 
 -record(side_pot, {
     amount = 0,
     cap = 0,
     members
   }).
+
 -record(pot, {
     amount = 0, %% amount in the pot
     main,
@@ -14,11 +15,15 @@
   }).
 
 %% blank pot
-new_side_pot() -> #side_pot{members = orddict:new()}.
-new() -> #pot{main = new_side_pot()}.
+new_side_pot() ->
+  #side_pot{members = orddict:new()}.
+
+new() ->
+  #pot{main = new_side_pot()}.
 
 to_string(Pot) when is_record(Pot, side_pot) ->
   io_lib:format("(total = ~p cap=~p members = ~p)", [total(Pot), Pot#side_pot.cap, Pot#side_pot.members]);
+
 to_string(Pot) when is_record(Pot, pot) ->
   io_lib:format("Total: ~p~n\tCurrent Pot: ~ts~n\tSide pots: ~ts~n", [total(Pot), to_string(Pot#pot.main),
     string:join(lists:map(fun(P) -> to_string(P) end, Pot#pot.side), "")
@@ -46,10 +51,8 @@ total(Pot) when is_record(Pot, pot) ->
 side_pots(Pot) when is_record(Pot, pot) ->
   [Pot#pot.main] ++ Pot#pot.side.
 
-erase(Pot, Member) -> ok.
-
 append(P, Member, Amount) when is_record(P, side_pot) ->
-  Pot = ensure_member(Member, P),
+  Pot = with_member(Member, P),
 
   %% main bet size
   Value = orddict:fetch(Member, Pot#side_pot.members),
@@ -69,7 +72,7 @@ append(P, Member, Amount) when is_record(P, side_pot) ->
 append(Pot, Member, Amount) when is_record(Pot, pot) ->
   append(Pot, Member, Amount, false).
 
-ensure_member(Member, P) when is_record(P, side_pot) ->
+with_member(Member, P) when is_record(P, side_pot) ->
   case orddict:is_key(Member, P#side_pot.members) of %% check member
     false ->
       P#side_pot{members = orddict:store(Member, 0, P#side_pot.members)};
