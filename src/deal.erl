@@ -17,23 +17,23 @@ new() ->
   #deal{deck = card:deck(), pot = pot:new()}.
 
 %%
-grant(Deal, Num) when is_record(Deal, deal) ->
+draw(Deal, Num) when is_record(Deal, deal) ->
   lists:sublits(Deal#deal.deck, 1, Num).
 
 %%
 burn(Deal, Num) when is_record(Deal, deal) ->
-  Burned = grant(Deal, Num),
+  Burned = draw(Deal, Num),
   {Deal#deal{deck = Deal#deal.deck -- Burned, burned = Deal#deal.burned ++ Burned}, Burned}.
 
 %%
 discard(Deal, Cards) when is_record(Deal, deal) ->
-  New = grant(Deal, erlang:length(Cards)),
+  New = draw(Deal, erlang:length(Cards)),
   {Deal#deal{deck = Deal#deal.deck -- New, burned = Deal#deal.burned ++ New}, New}.
 discard(Deal, Player, Cards) -> ok.
 
 %%
 hole(Deal, Num) when is_record(Deal, deal) ->
-  Cards = grant(Deal, Num),
+  Cards = draw(Deal, Num),
   {Deal#deal{deck = Deal#deal.deck -- Cards}, Cards}.
 
 hole(Deal, Player, Num) ->
@@ -41,7 +41,7 @@ hole(Deal, Player, Num) ->
 
 %%
 board(Deal, Num) when is_record(Deal, deal) ->
-  Cards = grant(Deal, Num),
+  Cards = draw(Deal, Num),
   {Deal#deal{board = Deal#deal.board ++ Cards}, Cards}.
 
 %%

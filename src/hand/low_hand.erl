@@ -27,14 +27,24 @@ ace5_low8(Cards) ->
 
 %% A-2-3-4-6
 %% 5 card rows with one gap, ace is low card; straights, repeats and flushes are ignored
-ace6_low(_) -> ok.
+ace6_low(Cards) ->
+  Hand = card:arrange_low(Cards),
+  {Rank, _} = high_card(Hand),
+  case Rank of
+    ?HIGH_CARD ->
+      Hand#hand{rank = {?ACE6}};
+    _Else ->
+      Hand
+  end.
 
 %% 2-3-4-5-7
 %% 5 card rows with one gap, eq: 23467, 23567, 24567, 34568; straights, repeats and flushes are ignored
-deuce7_low(Cards) when erlang:length(Cards) /= 5 -> throw("2-7 ranking allows 5 cards only");
+deuce7_low(Cards) when erlang:length(Cards) /= 5 ->
+  throw("2-7 ranking allows 5 cards only");
+
 deuce7_low(Cards) ->
   Hand = card:arrange(Cards),
-  {Rank, _} = Hand,
+  {Rank, _} = high_card(Hand),
   case Rank of
     ?HIGH_CARD ->
       Hand#hand{rank = {?DEUCE7}};
