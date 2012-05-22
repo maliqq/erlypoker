@@ -1,5 +1,4 @@
 %% pot manipulations - append, split
-
 -module(pot).
 -export([test/0, new/0, erase/2, append/3]).
 

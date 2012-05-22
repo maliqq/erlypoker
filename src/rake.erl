@@ -1,3 +1,4 @@
+%%
 -module(rake).
 -export([test/0, rake/2, rake/3]).
 

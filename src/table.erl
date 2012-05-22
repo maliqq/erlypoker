@@ -1,17 +1,9 @@
 -module(table).
 
-%% player states
--define(WAIT, 1). %% waiting next deal or BB
--define(IDLE, 2). %% sit out
--define(AWAY, 3). %% disconnected
--define(FOLD, 4). %% folded hand
--define(PLAY, 5). %% currently in deal
-
--define(ACTIVE, ?FOLD bor ?PLAY). %% active
-
 %% table types
 -define(NORMAL, 1). %% cash game
--define(BATTLE, 2). %% tournament mode (post blinds when sit out)
+-define(RANDOM, 2). %% random game
+-define(BATTLE, 3). %% tournament game
 
 -record(table, {
 		id,
@@ -36,11 +28,6 @@
 	  
 	  current %% current deal
   }).
-
--record(player, {
-		id,
-		name
-	}).
 
 -include("game.erl").
 -include("deal.erl").
@@ -70,16 +57,16 @@ cycled_position(N, Max) ->
 			N
 	end.
 
-is_after_button(Table, Player) ->
+is_after_button(Table, Seat) ->
 	Button = Table#table.button,
 	Max = Table#table.max,
-	{Seat, _} = lists:keyfind(Player#player.id, 2, Table#table.seats),
 	Middle = cycled_position(Button + Max div 2, Max),
-	SeatN = cycled_position(Seat + Max div 2, Max),
-	if
-		SeatN =< Middle -> false;
-		SeatN > Middle -> true
-	end.
+	Opposite = cycled_position(Seat + Max div 2, Max),
+	Opposite > Middle.
+
+%% cyclic increment #table.button
+move_button(Table) when is_record(Table, table) ->
+	Table#table{button = cycled_position(Table#table.button + 1, Table#table.max)}.
 
 players_with_state(Table, State) ->
 	[Player || {_, Player} <- Table#table.players, Player#player.state == State].
@@ -107,11 +94,6 @@ deal(Table) ->
 			Deal = deal:new(T#table.game, ActivePlayers),
 			T#table{current = Deal}
 	end.
-
-%% cyclic increment #table.button
-move_button(Table) when is_record(Table, table) ->
-  NewPosition = Table#table.button + 1,
-	Table#table{button = cycled_position(NewPosition, Table#table.max)}.
 
 sit(Table, Player) when is_record(Table, table), is_record(Player, player) ->
 	Table#table{players = lists:append({Player#player.id, Player}, Table#table.players)}.

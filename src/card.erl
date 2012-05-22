@@ -41,7 +41,8 @@ suit_to_string("d") ->
 suit_to_string("c") ->
   "club".
 
-kind_to_string(Kind) -> {_, Name} = lists:keyfind(Kind, 1, ?NAMES), Name.
+kind_to_string(Kind) ->
+  {_, Name} = lists:keyfind(Kind, 1, ?NAMES), Name.
 
 %% new card
 new(Kind, Suit) ->
