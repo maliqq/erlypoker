@@ -11,11 +11,9 @@
   }).
 
 -include("poker.hrl").
-
-%%
--include("hand/high_card.erl").
--include("hand/badugi_hand.erl").
--include("hand/low_hand.erl").
+-include("hand_high.erl").
+-include("hand_badugi.erl").
+-include("hand_low.erl").
 
 -define(RANKS, [{"high", fun high_card/1}, {"badugi", fun badugi_hand/1}, {"low", fun ace5_low/1}, {"low8", fun ace5_low8/1}, {"deuce7", fun deuce7_low/1}, {"ace6", fun ace6_low/1}]).
 

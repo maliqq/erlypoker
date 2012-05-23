@@ -1,4 +1,5 @@
 -module(card).
+
 -export([
     test/0, to_string/1, wrap/1, deck/0,
     group_kinds/1, group_suits/1, all/0, shuffle/1, pack/1, suit_to_string/1, kind_to_string/1,

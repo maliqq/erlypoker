@@ -121,11 +121,8 @@ is_high_card(Cards) ->
 	#hand{rank = {?HIGH_CARD, Highest#card.kind}, value = [Highest], kicker = card:kickers(Cards, [Highest], 4)}.
 
 %% detect high card rank of the hand
-high_card([]) ->
-	throw("no cards given for hand");
-high_card(Cards) when is_list(Cards) and erlang:length(Cards) > 7 ->
-	throw("max 7 cards per hand allowed");
-high_card(Cards) when is_list(Cards) ->
+high_card(Cards)
+		when is_list(Cards) and erlang:length(Cards) <= 7 and erlang:length(Cards) > 0 ->
   high_card(Cards, [fun is_straight_flush/1, fun is_three_kind/1, fun is_two_pair/1, fun is_one_pair/1, fun is_high_card/1]).
 
 high_card(_, []) ->
