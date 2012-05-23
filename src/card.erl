@@ -97,7 +97,7 @@ index(Card) ->
   index(Card, false).
 
 %%
-compare_(A, B) ->
+compare(A, B) ->
   index(A) =< index(B).
 compare_low(A, B) ->
   index(B, true) =< index(A, true).
@@ -108,7 +108,7 @@ diff(A, B) ->
 
 %% from A to 2
 arrange(Cards) ->
-  lists:sort(fun compare_/2, Cards).
+  lists:sort(fun compare/2, Cards).
 arrange(Cards, N) when is_integer(N) ->
   lists:sublist(arrange(Cards), N).
 %%
@@ -119,7 +119,7 @@ arrange_low(Cards, N) when is_integer(N) ->
 
 %%
 highest(Cards) ->
-  [Highest | _] = lists:sort(fun compare_/2, Cards), Highest.
+  [Highest | _] = lists:sort(fun compare/2, Cards), Highest.
 lowest(Cards) ->
   [Lowest | _] = lists:sort(fun compare_low/2, Cards), Lowest.
 %%
@@ -169,8 +169,8 @@ all() ->
 
 %%
 shuffle(Cards) ->
-  random:seed(erlang:now()),
-  lists:sort(fun(_, _) -> random:uniform() =< 0.5 end, Cards).
+  secure:init_random(),
+  lists:sort(fun(_, _) -> secure:get_random() =< 0.5 end, Cards).
 
 %%
 deck() ->

@@ -149,3 +149,10 @@ options(Type) when Type == ?BADUGI ->
     {streets, 3},
     {table_max, 8}
   ].
+
+rules(Type) when Type band ?HOLDEM == ?HOLDEM ->
+  [];
+rules(Type) when Type band ?DRAW == ?DRAW ->
+  [];
+rules(Type) when Type band ?CARD7 == ?CARD7 ->
+  [].

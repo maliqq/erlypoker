@@ -125,9 +125,7 @@ has_rainbow_paired(Cards) ->
       A#card_group.kind == B#card.kind
   end.
 %%
-badugi_hand(Cards) when erlang:length(Cards) /= 4 ->
-  throw("badugi hand is exact 4 cards");
-badugi_hand(Cards) ->
+badugi_hand(Cards) when erlang:length(Cards) == 4 ->
   badugi_hand(Cards, [fun is_badugi4/1, fun is_badugi3/1, fun is_badugi2/1, fun is_badugi1/1]).
 badugi_hand(_, []) ->
   false;
