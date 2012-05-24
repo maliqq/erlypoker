@@ -2,7 +2,7 @@
 
 -export([
     test/0, to_string/1, wrap/1, deck/0,
-    group_kinds/1, group_suits/1, all/0, shuffle/1, pack/1, suit_to_string/1, kind_to_string/1,
+    split_rows/1, group_kinds/1, group_suits/1, all/0, shuffle/1, pack/1, suit_to_string/1, kind_to_string/1,
     arrange/1, arrange/2, arrange_low/1, arrange_low/2,
     highest/1, lowest/1, kickers/3, freq/2
   ]).
@@ -145,7 +145,8 @@ group(F, [H|T]) when is_function(F) ->
 %% split result:
 %%  Group1: [A{h,d}, Ks, Q{d,h}, Js, Tc] Group2: [8c] Group3: [2c, 3c, 4d]
 split_rows(Cards) ->
-  Grouped = group(fun(Prev, Next) -> diff(Prev, Next) < 2 end, arrange(Cards)),
+  Aces = lists:filter(fun(C) -> C#card.kind == "A" end, Cards),
+  Grouped = group(fun(Prev, Next) -> (diff(Prev, Next) < 2) or (diff(Prev, Next) >= 12) end, arrange(Cards) ++ Aces),
   lists:map(fun(G) -> [First | _] = G, #card_group{kind = First#card.kind, value = G} end, Grouped).
 
 %% cards with same kind
