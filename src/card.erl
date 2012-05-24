@@ -170,8 +170,18 @@ all() ->
 
 %%
 shuffle(Cards) ->
-  secure:init_random(),
-  lists:sort(fun(_, _) -> secure:get_random() =< 0.5 end, Cards).
+  randomize(round(math:log(length(Cards)) + 0.5), Cards).
+
+randomize(1, List) ->
+  randomize(List);
+randomize(T, List) ->
+  lists:foldl(fun(_E, Acc) ->
+    randomize(Acc)
+  end, randomize(List), lists:seq(1, (T - 1))).
+randomize(List) ->
+   lists:sort(fun(_, _) ->
+      secure:random() =< 0.5
+   end, List).
 
 %%
 deck() ->
