@@ -3,10 +3,10 @@
 -record(card_group, {kind = none, suit = none, value}).
 
 -record(bet, {
-    raise = false,
+    amount,
     call = false,
     fold = false,
-    ai = false, %% all in
+    all_in = false,
     forced = false %% blinds and ante
   }).
 

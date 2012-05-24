@@ -1,5 +1,5 @@
 -module(deal).
--export([test/0, new/0, burn/2, discard/2, hole/2, board/2, vela/1]).
+-export([test/0, new/0, burn/2, discard/2, hole/2, board/2]).
 
 %%
 -record(deal, {
@@ -23,29 +23,36 @@ take(Deal, Num) when is_record(Deal, deal) ->
 %%
 burn(Deal, Num) when is_record(Deal, deal) ->
   Burned = take(Deal, Num),
-  {Deal#deal{deck = Deal#deal.deck -- Burned, burned = Deal#deal.burned ++ Burned}, Burned}.
+  {Burned, Deal#deal{deck = Deal#deal.deck -- Burned, burned = Deal#deal.burned ++ Burned}}.
 
 %%
 discard(Deal, Cards) when is_record(Deal, deal) ->
   New = take(Deal, erlang:length(Cards)),
-  {Deal#deal{deck = Deal#deal.deck -- New, burned = Deal#deal.burned ++ New}, New}.
+  {New, Deal#deal{deck = Deal#deal.deck -- New, burned = Deal#deal.burned ++ New}}.
 
 %%
 hole(Deal, Num) when is_record(Deal, deal) ->
   Cards = take(Deal, Num),
-  {Deal#deal{deck = Deal#deal.deck -- Cards}, Cards}.
+  {Cards, Deal#deal{deck = Deal#deal.deck -- Cards}}.
 
 %%
 board(Deal, Num) when is_record(Deal, deal) ->
   Cards = take(Deal, Num),
-  {Deal#deal{board = Deal#deal.board ++ Cards}, Cards}.
+  {Cards, Deal#deal{board = Deal#deal.board ++ Cards}}.
 
-%%
-vela(Deal) when is_record(Deal, deal) ->
-  board(Deal, 1).
+deal(Deal, Seats, Num) ->
+  lists:mapfoldl(fun(Seat, D) ->
+    {Cards, D1} = hole(D, Num),
+    {Seat#seat{cards = Cards}, D1}
+  end, Deal, Seats).
 
 %%
 test() ->
-  io:format("random deck: "),
-  [io:format("~ts ", [card:to_string(Card)]) || Card <- card:deck()],
+  random:seed(erlang:now()),
+
+  io:format("new random deck: "),
+  Deal = new(),
+  io:format("~ts~n", [card:to_string(Deal#deal.deck)]),
+  {Seats, _} = deal(Deal, [#seat{}, #seat{}, #seat{}, #seat{}, #seat{}, #seat{}, #seat{}, #seat{}], 2),
+  lists:foreach(fun(Seat) -> io:format("Hand ~ts~n", [card:to_string(Seat#seat.cards)]) end, Seats),
   io:format("~n").
