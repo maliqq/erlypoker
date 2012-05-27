@@ -3,9 +3,9 @@
 
 %%
 -record(dealer, {
-    live,
+    deck, %% live cards
     board = [],
-    burned = [], %% burned cards for reshuffle deck
+    burned = [], %% for reshuffle deck
     dealt = [] %% dealt cards
   }).
 
@@ -14,7 +14,7 @@
 
 %% blank deal
 new() ->
-  #dealer{live = card:deck()}.
+  #dealer{deck = card:deck()}.
 
 %%
 take(Dealer, Num) when is_record(Dealer, deal) ->

@@ -11,7 +11,6 @@
     game,
     type,
     state,    %% registering, canceled, paused, active, bubble
-    
     buy_in,   %% {100.0, 10000}
     rake,     %% 9.0
     rebuy,    %% {100.0, 10000}
