@@ -1,13 +1,14 @@
 -module(card).
 
 -export([
-    test/0, to_string/1, wrap/1, deck/0,
+    to_string/1, wrap/1, deck/0,
     split_rows/1, group_kinds/1, group_suits/1, all/0, shuffle/1, pack/1, suit_to_string/1, kind_to_string/1,
     arrange/1, arrange/2, arrange_low/1, arrange_low/2,
     highest/1, lowest/1, kickers/3, freq/2
   ]).
 
 -include("poker.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 -define(NAMES, [
     {"A", "ace"},   {"K", "king"},  {"Q", "queen"}, {"J", "jack"},  {"T", "ten"},
@@ -188,17 +189,16 @@ deck() ->
   shuffle(all()).
 
 %%
-test_suit() ->
+suit_test() ->
   io:format("suits: ~p~n", [?SUITS]),
   io:format("spade: ~ts~n", [suit_to_char("s")]).
 
 %%
-test_kind() ->
+kind_test() ->
   io:format("all kinds: ~p~n", [?KINDS]).
 
 %%
-test() ->
-  test_kind(), test_suit(),
+card_test() ->
   io:format("parsed from string: "),
   [io:format("~ts ", [to_string(Card)]) || Card <- wrap("AhJd")],
   io:format("~ncard indexes: "),

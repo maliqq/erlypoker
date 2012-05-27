@@ -135,5 +135,5 @@ badugi_hand(Cards, [F|Tail]) when is_function(F) ->
     Hand -> Hand
   end.
 
-test_badugi_hand() ->
+badugi_hand_test() ->
   io:format("~ts~n", [to_string(badugi_hand(card:wrap("2d3c4s4s")))]).

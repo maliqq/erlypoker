@@ -1,4 +1,13 @@
--record(game, {id, type, limit}).
+-record(game, {type, limit}).
+
+-record(limit, {
+    type,
+    ante = 0,
+    bring_in = 0,
+    small_blind = 0,
+    big_blind = 0,
+    big_bet = 0
+  }).
 
 %% limits
 -define(NO_LIMIT, 1). %% NL

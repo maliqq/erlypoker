@@ -14,12 +14,20 @@
     side = [] %% side pots, last is main pot
   }).
 
+-include_lib("eunit/include/eunit.hrl").
+
 %% blank pot
-new_side_pot() ->
+new_side() ->
   #side_pot{members = orddict:new()}.
 
 new() ->
-  #pot{main = new_side_pot()}.
+  #pot{main = new_side()}.
+
+json_data(Pot) when is_record(Pot, side_pot) ->
+  .
+
+json_data(Pot) when is_record(Pot, pot) ->
+  .
 
 to_string(Pot) when is_record(Pot, side_pot) ->
   io_lib:format("(total = ~p cap=~p members = ~p)", [total(Pot), Pot#side_pot.cap, Pot#side_pot.members]);
@@ -125,7 +133,7 @@ append(Pot, Member, Amount, Cap) when is_record(Pot, pot) ->
       P
   end.
 
-test() ->
+pot_test() ->
   Pot = new(),
   Pot1 = append(Pot, "A", 27, true),
   Pot2 = append(Pot1, "B", 100),

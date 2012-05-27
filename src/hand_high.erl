@@ -132,5 +132,5 @@ high_card(Cards, [F|List]) when is_function(F) ->
 		Hand -> Hand
 	end.
 
-test_high_card() ->
+high_card_test() ->
   ok.

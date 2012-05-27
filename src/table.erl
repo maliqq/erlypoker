@@ -1,53 +1,37 @@
 -module(table).
 
-%% table types
--define(NORMAL, 1). %% cash game
--define(RANDOM, 2). %% random game
--define(BATTLE, 3). %% tournament game
+-export([new/1]).
 
--record(table, {
-		id,
+-include("poker.hrl").
+-include("game.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
-	  game, %% Texas Holdem No Limit
-	  type,
+new(Max) ->
+	#table{seats = seat:create(Max), players = gb_trees:empty(), waiting = gb_sets:empty()}.
 
-	  state,
+json_data(Table) ->
+	.
 
-	  ante = 0,
-	  bring_in = 0,
-	  sb,
-	  bb,
+increase_blinds(Table, Blinds, Ante) ->
+	.
 
-	  seats = [],
+next_deal(Table) ->
+	.
 
-	  players = [], %%
-	  waiting = [], %%
+rotate_game(Table, Game) ->
+	.
 
-	  max = 9,
+cast_message(Table) ->
+	.
 
-	  button = 1, %% current button position
+emit_message(Table, Player) ->
+	.
 
-	  current %% current deal
-  }).
+close(Table) ->
+	Table#table{state = closed}.
 
--include("game.erl").
--include("deal.erl").
--include("bet.erl").
+pause(Table) ->
+	Table#table{state = paused}.
 
-cycle_position(N, Max) ->
-	if
-		N > Max ->
-			Max - N;
-		true ->
-			N
-	end.
-
-is_after_button(Table, Seat) ->
-	Button = Table#table.button,
-	Max = Table#table.max,
-	Middle = cycle_position(Button + Max div 2, Max),
-	Opposite = cycle_position(Seat + Max div 2, Max),
-	Opposite > Middle.
-
-move_button(Table) when is_record(Table, table) ->
-	Table#table{button = cycle_position(Table#table.button + 1, Table#table.max)}.
+table_test() ->
+	.

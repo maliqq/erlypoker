@@ -1,6 +1,6 @@
--define(ACE5, 13).
--define(DEUCE7, 14).
--define(ACE6, 15).
+-define(LOW_ACE5, 13).
+-define(LOW_DEUCE7, 14).
+-define(LOW_ACE6, 15).
 
 %% A-2-3-4-5
 %% any low cards; repeats are ignored
@@ -9,7 +9,7 @@ ace5_low(Cards) ->
   if
     erlang:length(Groups) >= 5 ->
       Value = card:arrange_low(Groups, 5),
-      #hand{rank={?ACE5}, value = Value};
+      #hand{rank={?LOW_ACE5}, value = Value};
     true -> false
   end.
 
@@ -22,7 +22,7 @@ ace5_low8(Cards) ->
     Hand == false ->
       false;
     true ->
-      Hand#hand{rank={?ACE5}}
+      Hand#hand{rank={?LOW_ACE5}}
   end.
 
 %% A-2-3-4-6
@@ -32,7 +32,7 @@ ace6_low(Cards) ->
   {Rank, _} = high_card(Hand),
   case Rank of
     ?HIGH_CARD ->
-      Hand#hand{rank = {?ACE6}};
+      Hand#hand{rank = {?LOW_ACE6}};
     _Else ->
       Hand
   end.
@@ -45,10 +45,10 @@ deuce7_low(Cards) when erlang:length(Cards) == 5 ->
   {Rank, _} = high_card(Hand),
   case Rank of
     ?HIGH_CARD ->
-      Hand#hand{rank = {?DEUCE7}};
+      Hand#hand{rank = {?LOW_DEUCE7}};
     _Else ->
       Hand
   end.
 
-test_low_hand() ->
+low_hand_test() ->
   ok.

@@ -1,10 +1,27 @@
 -module(player).
+-export([add/3]).
 
-%% player states
--define(WAIT, 1). %% waiting next deal or BB
--define(IDLE, 2). %% sit out
--define(AWAY, 3). %% disconnected
--define(FOLD, 4). %% folded hand
--define(PLAY, 5). %% currently in deal
+-include("poker.hrl").
 
--define(ACTIVE, ?FOLD bor ?PLAY). %% active
+json_data(Player) ->
+  .
+
+add(T, P, Position) when is_record(T, table) ->
+  Table = remove_waiting(T, P),
+  Player = P#player{state = ?WAIT},
+  Players = gb_trees:insert(Player#player.id, Position, Table#table.players),
+  Table#table{players = Players}.
+
+-define(MAX_WAITING, 100).
+
+add_waiting(Table, Player) ->
+  Size = gb_sets:size(Table#table.waiting),
+  if
+    Size < MAX_WAITING ->
+      {ok, Table#table{waiting = gb_sets:add(Player#player.id, Table#table.waiting)}};
+    true ->
+      {limit_exceed, Table}
+  end.
+
+remove_waiting(Table Player) ->
+  Table#table{waiting = gb_sets:delete_any(Player#player.id, Table#table.waiting)}.

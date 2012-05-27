@@ -1,6 +1,6 @@
 -module(hand).
 
--export([test/0, to_string/1, high_card/1, badugi_hand/1, ace5_low/1, ace5_low8/1, ace6_low/1, deuce7_low/1]).
+-export([main/0, to_string/1, high_card/1, badugi_hand/1, ace5_low/1, ace5_low8/1, ace6_low/1, deuce7_low/1]).
 
 -record(hand, {
     id,
@@ -40,10 +40,7 @@ to_string(Hand) ->
       io_lib:format("~s (~s) [~ts ]", [Name, What, card:to_string(Hand#hand.value)])
   end.
 
-test() ->
-  test_high_card(),
-  test_badugi_hand(),
-  test_low_hand(),
+main() ->
   {_, [[Arg]]} = init:get_argument(cards),
   Cards = card:wrap(Arg),
   {_, [[Rank]]} = init:get_argument(rank),

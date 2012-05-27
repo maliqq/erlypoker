@@ -3,6 +3,7 @@
 
 -include("game.hrl").
 -include("game_settings.erl").
+-include("game_rules.erl").
 
 %% new_game(?TEXAS, ?NO_LIMIT).
 new(Type, Limit) -> #game{type = Type, limit = Limit}.
