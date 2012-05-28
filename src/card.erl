@@ -176,7 +176,7 @@ shuffle(Cards) ->
 randomize(1, List) ->
   randomize(List);
 randomize(T, List) ->
-  lists:foldl(fun(_E, Acc) ->
+  lists:foldl(fun(_, Acc) ->
     randomize(Acc)
   end, randomize(List), lists:seq(1, (T - 1))).
 randomize(List) ->
