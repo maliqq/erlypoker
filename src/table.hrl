@@ -3,14 +3,14 @@
     rebuys,
     addons,
     places_paid,
-    structure,
+    payout_structure,
     results
   }).
 
 -record(battle, {
     game,
     type,
-    state,    %% registering, canceled, paused, active, bubble
+    state,    %% registering, canceled, paused, running
     buy_in,   %% {100.0, 10000}
     rake,     %% 9.0
     rebuy,    %% {100.0, 10000}
@@ -24,13 +24,12 @@
 
     start,
     finish,
-    rebuy_period, %% 4 levels
     level_period, %% 15 min
-    break_period,
-    late_reg_period,
+    rebuy_levels, %% 4 levels
+    break_period, %% 5 min
+    late_reg_period, %% 8 levels
 
     levels,
-
     tables,
     players
   }).

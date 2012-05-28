@@ -23,10 +23,11 @@
 -define(STUD8, 5).
 -define(RAZZ, 6).
 -define(LONDON, 7).
-%% draw
+%% 5 card draw
 -define(CARD5, 8).
 -define(SINGLE27, 9).
 -define(TRIPLE27, 10).
+%% 4 card draw
 -define(BADUGI, 11).
 %% mixes
 -define(HORSE, 12).
@@ -42,3 +43,11 @@
 -define(CARD7, ?STUD bor ?STUD8 bor ?RAZZ bor ?LONDON). %% 7 card poker
 -define(DRAW, ?CARD5 bor ?SINGLE27 bor ?TRIPLE27 bor ?BADUGI). %% draw poker
 -define(MIX, ?HORSE bor ?HOSE bor ?MIX7 bor ?MIX8 bor ?MIXED_HOLDEM bor ?MIXED_STUD bor ?MIXED_DRAW). %% mixed poker
+
+
+-define(limits(), ["no_limit", "pot_limit", "fixed_limit"]).
+-define(games(), [
+    "texas", "omaha", "omaha8",
+    "stud", "stud8", "razz", "london",
+    "card5", "single27", "triple27", "badugi"
+  ]).
