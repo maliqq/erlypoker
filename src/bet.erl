@@ -9,6 +9,69 @@ to_string(Bet, Message) when Bet#bet.all_in =:= true ->
 to_string(_, Message) ->
   lists:flatten(Message).
 
+%% forced bets
+-define(ANTE, 1).
+-define(SMALL_BLIND, 2).
+-define(BIG_BLIND, 3).
+-define(GUEST_BLIND, 4).
+-define(BRING_IN, 5).
+-define(STRADDLE, 6).
+
+%% bet actions
+-define(FOLD, 7).
+-define(CHECK, 8).
+-define(RAISE, 9).
+-define(CALL, 10).
+
+%% draw actions
+-define(DISCARD, 11).
+-define(STAND_PAT, 12).
+
+%% card actions
+-define(MUCK, 13).
+
+%% buy-in actions
+-define(REBUY, 14).
+-define(DOUBLE_REBUY, 15).
+-define(ADDON, 18).
+
+to_string({?ANTE, N}) ->
+  io_lib:format("posts the ante ~p", [N]);
+to_string({?SMALL_BLIND, N}) ->
+  io_lib:format("posts small blind ~p", [N]);
+to_string({?BIG_BLIND, N}) ->
+  io_lib:format("posts big blind ~p", [N]);
+to_string({?GUEST_BLIND, N}) ->
+  io_lib:format("posts guest blind ~p", [N]);
+to_string({?BRING_IN, N}) ->
+  io_lib:format("posts bring-in ~p", [N]);
+to_string({?STRADDLE, N}) ->
+  io_lib:format("posts straddle ~p", [N]);
+
+to_string({?FOLD}) ->
+  "folds";
+to_string({?CHECK}) ->
+  "checks";
+to_string({?STAND_PAT}) ->
+  "stands pat";
+to_string({?MUCK}) ->
+  "mucks hand";
+to_string({?DISCARD, N}) ->
+  io_lib:format("discards ~p cards", [N]);
+to_string({?REBUY, Chips, Money}) ->
+  io_lib:format("rebuys ~p chips for ~p", [Chips, Money]);
+to_string({?DOUBLE_REBUY, Chips, Money}) ->
+  io_lib:format("double rebuys ~p chips for ~p", [Chips, Money]);
+to_string({?ADDON, Chips, Money}) ->
+  io_lib:format("add-ons ~p chips for ~p", [Chips, Money]);
+
+to_string({?RAISE, N}) ->
+  io_lib:format("bets ~p", [N]);
+to_string({?RAISE, M, N}) ->
+  io_lib:format("raises ~p to ~p", [M, N]);
+to_string({?CALL, N}) ->
+  io_lib:format("calls ~p", [N]);
+
 to_string(Bet) when is_record(Bet, bet), Bet#bet.fold =:= true ->
   "folds";
 
