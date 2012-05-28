@@ -88,7 +88,7 @@ dealer_test() ->
   {Board, Dealer5} = board(Dealer, 3),
   ?assertEqual([], Dealer5#dealer.board -- Board).
 
-run() ->
+main() ->
   random:seed(erlang:now()),
   io:format("new random deck: "),
   Dealer = new(),
