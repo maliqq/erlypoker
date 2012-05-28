@@ -10,16 +10,17 @@ create(Max) ->
   Seats = erlang:make_tuple(Max, none),
   create(Seats, Max).
 
-create(Seats, I) when I =:= 0 ->
+create(Seats, 0) ->
   Seats;
 
-create(Seats, I) ->
+create(Seats, Index) ->
   Seat = #seat{
     player = none,
     chips = 0,
+    index = Index,
     state = ?EMPTY
   },
-  create(setelement(I, Seats, Seat), I - 1).
+  create(setelement(Index, Seats, Seat), Index - 1).
 
 reserve(Table, Player, Position) when is_record(Table, table) ->
   Seat = element(Position, Table#table.seats),

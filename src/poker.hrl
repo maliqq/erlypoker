@@ -1,15 +1,36 @@
 %%
--record(card, {kind, suit}).
--record(card_group, {kind = none, suit = none, value}).
-
--record(bet, {
-    amount,
-    call = false,
-    fold = false,
-    all_in = false,
-    forced = false %% blinds and ante
+-record(card, {
+    kind,
+    suit
+  }).
+-record(card_group, {
+    kind = none,
+    suit = none,
+    value
   }).
 
+-record(forced_bet, {
+    ante = 0,
+    bring_in = 0,
+    small_blind = 0,
+    big_blind = 0,
+    guest_blind = 0,
+    straddle = 0
+  }).
+
+-record(bet, {
+    raise = false,
+    call = false,
+    fold = false,
+    all_in = false
+  }).
+
+-record(balance, { %% tournament balance
+    buy_in = 0,
+    rebuy_limit = 0,
+    addon_limit = 0,
+    bounty_players = []
+  }).
 -record(player, {
     id,
     name,
@@ -44,13 +65,6 @@
     action
   }).
 
--record(balance, { %% tournament balance
-    buy_in = 0,
-    rebuy_limit = 0,
-    addon_limit = 0,
-    bounty_players = []
-  }).
-
 -record(table, {
     id,
     game, type, state,
@@ -63,6 +77,3 @@
 -define(NORMAL_TABLE, 1). %% cash game
 -define(RANDOM_TABLE, 2). %% random game
 -define(BATTLE_TABLE, 3). %% tournament game
-
--define(SUITS, ["s", "h", "d", "c"]).
--define(KINDS, ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]).

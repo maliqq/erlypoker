@@ -17,18 +17,21 @@
 -include("hand_badugi.erl").
 -include("hand_low.erl").
 
+%%
 hand(high, Cards) ->
   hand_high(Cards);
 hand(badugi, Cards) ->
   hand_badugi(Cards);
-hand(ace_five, Cards) ->
-  hand_low(ace_five, Cards);
-hand(ace_six, Cards) ->
-  hand_low(ace_six, Cards);
-hand(ace_six_better, Cards) ->
-  hand_low(ace_six_better, Cards);
-hand(deuce_seven, Cards) ->
-  hand_low(deuce_seven, Cards);
+hand(Low, Cards) ->
+  hand_low(Low, Cards).
+
+%% 0 - equal
+compare(high, Hand1, Hand2) ->
+  compare_high(Hand1, Hand2);
+compare(badugi, Hand1, Hand2) ->
+  compare_badugi(Hand1, Hand2);
+compare(Low, Hand1, Hand2) ->
+  compare_low(Low, Hand1, Hand2).
 
 %%
 to_string(Hand) ->

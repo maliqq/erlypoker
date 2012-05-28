@@ -6,7 +6,8 @@
 -include("game_rules.erl").
 
 %%
-new(Type, Limit) -> #game{type = Type, limit = Limit}.
+new(Type, Limit) ->
+  #game{type = Type, limit = Limit}.
 
 to_string(Game) when is_record(Gane, game) ->
   io_lib:format("", []).

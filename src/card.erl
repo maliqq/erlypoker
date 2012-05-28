@@ -41,18 +41,18 @@ kind_to_string(Kind) when is_integer(Kind) ->
 kind_to_string(Kind) ->
   kind_to_string(kind_index(Kind)).
 
-kind_index(Kind, Low) ->
-  Index = kind_index(kind_to_char(Kind)),
+kind_index(Kind, Low = false) ->
+  kind_index(Kind);
+kind_index(Kind, Low = true) ->
+  Index = kind_index(Kind),
   if
-    Low ->
-      if
-        Kind == ?ACE -> 0;
-        true -> Index + 1
-      end;
-    true -> Index
+    Kind == ?ACE -> 0;
+    true -> Index + 1
   end.
 
-kind_index(Kind) ->
+kind_index(Kind) when is_integer(Kind) ->
+  Kind;
+kind_index(Kind) when is_list(Kind) ->
   string:str(?kind_chars(), Kind) - 1.
 
 %% card is tuple of kind and suit
@@ -142,6 +142,7 @@ lowest(Cards) ->
 %%
 kickers(Cards, Except, N) when is_integer(N) ->
   Kinds = lists:map(fun(X) -> X#card.kind end, Except),
+  %% TODO use sets
   Kickers = lists:filter(fun(X) -> not lists:member(X#card.kind, Kinds) end, Cards),
   arrange(Kickers, N).
 
@@ -162,28 +163,39 @@ group(F, [H|T]) when is_function(F) ->
 %% split result:
 %%  Group1: [A{h,d}, Ks, Q{d,h}, Js, Tc] Group2: [8c] Group3: [2c, 3c, 4d]
 split_rows(Cards) ->
-  Aces = lists:filter(fun(C) -> C#card.kind == ?ACE end, Cards),
-  Grouped = group(fun(Prev, Next) -> (diff(Prev, Next) < 2) or (diff(Prev, Next) >= 12) end, arrange(Cards) ++ Aces),
+  Aces = lists:filter(fun(C) ->
+    C#card.kind == ?ACE
+  end, Cards),
+  
+  Grouped = group(fun(Prev, Next) ->
+    (diff(Prev, Next) < 2) or (diff(Prev, Next) >= 12)
+  end, arrange(Cards) ++ Aces),
+  
   lists:map(fun(G) -> [First | _] = G, #card_group{kind = First#card.kind, value = G} end, Grouped).
 
 %% cards with same kind
 group_suits(Cards) ->
-  Sorted = lists:keysort(1, lists:map(fun(C) -> {suit_index(C#card.suit), C} end, Cards)),
-  Grouped = group(fun(Prev, Next) -> Prev#card.suit == Next#card.suit end, lists:map(fun({_, C}) -> C end, Sorted)),
+  Sorted = lists:keysort(1, lists:map(fun(C) ->
+    {suit_index(C#card.suit), C}
+  end, Cards)),
+
+  Grouped = group(fun(Prev, Next) ->
+    Prev#card.suit == Next#card.suit
+  end, lists:map(fun({_, C}) -> C end, Sorted)),
+  
   lists:map(fun(G) -> [First | _] = G, #card_group{suit = First#card.suit, value = G} end, Grouped).
 
 %% cards with same suit
 group_kinds(Cards) ->
-  Grouped = group(fun(Prev, Next) -> Prev#card.kind == Next#card.kind end, arrange(Cards)),
+  Grouped = group(fun(Prev, Next) ->
+    Prev#card.kind == Next#card.kind
+  end, arrange(Cards)),
+  
   lists:map(fun(G) -> [First | _] = G, #card_group{kind = First#card.kind, value = G} end, Grouped).
 
 %%
 freq(Cards, Num) ->
   [Repeat || Repeat <- group_kinds(Cards), erlang:length(Repeat#card_group.value) == Num].
-
-%% all cards
-all() ->
-  [new(Kind, Suit) || Kind <- ?KINDS, Suit <- ?SUITS].
 
 %%
 shuffle(Cards) ->
@@ -191,10 +203,10 @@ shuffle(Cards) ->
 
 randomize(1, List) ->
   randomize(List);
-randomize(T, List) ->
-  lists:foldl(fun(_, Acc) ->
-    randomize(Acc)
-  end, randomize(List), lists:seq(1, (T - 1))).
+randomize(N, List) ->
+  lists:foldl(fun(_, L) ->
+    randomize(L)
+  end, randomize(List), lists:seq(1, N - 1)).
 randomize(List) ->
    lists:sort(fun(_, _) ->
       secure:random() =< 0.5
@@ -202,7 +214,7 @@ randomize(List) ->
 
 %%
 deck() ->
-  shuffle(all()).
+  shuffle(?cards()).
 
 %%
 suit_test() ->
@@ -224,7 +236,7 @@ card_test() ->
   ?assertEqual(?ACE, index(new("A", "h")))
   .
 
-run() ->
+main() ->
   io:format("parsed from string: "),
   [io:format("~ts ", [to_string(Card)]) || Card <- wrap("AhJd")],
   io:format("~ncard indexes: "),

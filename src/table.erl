@@ -13,13 +13,19 @@ json_data(Table) ->
 	.
 
 increase_blinds(Table, Blinds, Ante) ->
-	.
+	cast_message({
+		blinds, increase, []
+	}).
 
 next_deal(Table) ->
-	.
+	cast_message({
+		deal, start, deal:json_data(Deal)
+	}).
 
-rotate_game(Table, Game) ->
-	.
+switch_game(Table, Game) ->
+	cast_message({
+		game, switch, game:json_data(Game)
+	}).
 
 cast_message(Table) ->
 	.
@@ -28,10 +34,16 @@ emit_message(Table, Player) ->
 	.
 
 close(Table) ->
-	Table#table{state = closed}.
+	Table#table{state = closed},
+	cast_message({
+		table, close
+	}).
 
 pause(Table) ->
-	Table#table{state = paused}.
+	Table#table{state = paused},
+	cast_message({
+		table, pause
+	}).
 
 table_test() ->
 	.

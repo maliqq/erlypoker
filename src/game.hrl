@@ -44,7 +44,6 @@
 -define(DRAW, ?CARD5 bor ?SINGLE27 bor ?TRIPLE27 bor ?BADUGI). %% draw poker
 -define(MIX, ?HORSE bor ?HOSE bor ?MIX7 bor ?MIX8 bor ?MIXED_HOLDEM bor ?MIXED_STUD bor ?MIXED_DRAW). %% mixed poker
 
-
 -define(limits(), ["no_limit", "pot_limit", "fixed_limit"]).
 -define(games(), [
     "texas", "omaha", "omaha8",
