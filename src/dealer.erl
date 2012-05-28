@@ -59,12 +59,6 @@ board(D, Num) when is_record(D, deal) ->
     board = Dealer#dealer.board ++ Cards
   }}.
 
-deal(Dealer, Seats, Num) ->
-  lists:mapfoldl(fun(Seat, D) ->
-    {Cards, D1} = hole(D, Num),
-    {Seat#seat{cards = Cards}, D1}
-  end, Dealer, Seats).
-
 %%
 dealer_test() ->
   Dealer = new(),
