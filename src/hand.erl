@@ -11,23 +11,29 @@
   }).
 
 -include("poker.hrl").
+-include("card.hrl").
+-include("hand.hrl").
 -include("hand_high.erl").
 -include("hand_badugi.erl").
 -include("hand_low.erl").
 
--define(RANKS, [{"high", fun high_card/1}, {"badugi", fun badugi_hand/1}, {"low", fun ace5_low/1}, {"low8", fun ace5_low8/1}, {"deuce7", fun deuce7_low/1}, {"ace6", fun ace6_low/1}]).
-
--define(NAMES, [
-    %% high card
-    {0, "high_card"}, {1, "one_pair"}, {2, "two_pair"}, {3, "three_kind"}, {4, "straight"}, {5, "flush"}, {6, "full_house"}, {7, "four_kind"}, {8, "straight_flush"},
-    %% badugi
-    {9, "one_card"}, {10, "two_card"}, {11, "three_card"}, {12, "four_card"}
-  ]).
+hand(high, Cards) ->
+  hand_high(Cards);
+hand(badugi, Cards) ->
+  hand_badugi(Cards);
+hand(ace_five, Cards) ->
+  hand_low(ace_five, Cards);
+hand(ace_six, Cards) ->
+  hand_low(ace_six, Cards);
+hand(ace_six_better, Cards) ->
+  hand_low(ace_six_better, Cards);
+hand(deuce_seven, Cards) ->
+  hand_low(deuce_seven, Cards);
 
 %%
 to_string(Hand) ->
   case Hand of
-    false -> "[no hand]";
+    false -> false;
     _Else ->
       {N, W} = Hand#hand.rank,
       {_, Name} = lists:keyfind(N, 1, ?NAMES),
@@ -44,7 +50,6 @@ main() ->
   {_, [[Arg]]} = init:get_argument(cards),
   Cards = card:wrap(Arg),
   {_, [[Rank]]} = init:get_argument(rank),
-  {_, F} = lists:keyfind(Rank, 1, ?RANKS),
-  Hand = F(Cards),
+  Hand = hand(list_to_atom(Rank), Cards),
   io:format(to_string(Hand)),
   io:format("~n").

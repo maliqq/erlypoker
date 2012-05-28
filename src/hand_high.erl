@@ -9,6 +9,20 @@
 -define(FOUR_KIND, 7).
 -define(STRAIGHT_FLUSH, 8).
 
+%% detect high card rank of the hand
+hand_high(Cards) when is_list(Cards) and (erlang:length(Cards) =< 7) and (erlang:length(Cards) > 0) ->
+  hand_high(Cards, [
+  	fun is_straight_flush/1, fun is_three_kind/1, fun is_two_pair/1, fun is_one_pair/1, fun is_high_card/1
+	]).
+
+hand_high(_, []) ->
+	false;
+hand_high(Cards, [F|List]) when is_function(F) ->
+	case F(Cards) of
+		false -> hand_high(Cards, List);
+		Hand -> Hand
+	end.
+
 %% 5 (or more) cards in a row
 %% TODO A-5 straight
 is_straight(Cards) ->
@@ -38,10 +52,10 @@ is_flush(Cards) ->
 is_straight_flush(Cards) ->
 	case is_flush(Cards) of
 	  false ->
-	  	high_card(Cards, [fun is_four_kind/1, fun is_full_house/1, fun is_straight/1]); %% skip flush
+	  	hand_high(Cards, [fun is_four_kind/1, fun is_full_house/1, fun is_straight/1]); %% skip flush
 	  Flush ->
 	    case is_straight(Flush#hand.value) of
-	      false -> high_card(Cards, [fun is_four_kind/1, fun is_full_house/1]); %% skip straight & flush
+	      false -> hand_high(Cards, [fun is_four_kind/1, fun is_full_house/1]); %% skip straight & flush
 	      Straight ->
 	        {_, Kind} = Straight#hand.rank, {_, Suit} = Flush#hand.rank,
 	        #hand{rank = {?STRAIGHT_FLUSH, Kind}, value = Flush#hand.value, high = card:new(Kind, Suit)}
@@ -116,21 +130,9 @@ is_one_pair(Cards) ->
 	end.
 
 %% ABCDE, "high card A with B, C, D, E kicker"
-is_high_card(Cards) ->
+is_hand_high(Cards) ->
 	Highest = card:highest(Cards),
 	#hand{rank = {?HIGH_CARD, Highest#card.kind}, value = [Highest], kicker = card:kickers(Cards, [Highest], 4)}.
-
-%% detect high card rank of the hand
-high_card(Cards) when is_list(Cards) and (erlang:length(Cards) =< 7) and (erlang:length(Cards) > 0) ->
-  high_card(Cards, [fun is_straight_flush/1, fun is_three_kind/1, fun is_two_pair/1, fun is_one_pair/1, fun is_high_card/1]).
-
-high_card(_, []) ->
-	false;
-high_card(Cards, [F|List]) when is_function(F) ->
-	case F(Cards) of
-		false -> high_card(Cards, List);
-		Hand -> Hand
-	end.
 
 high_card_test() ->
   ok.

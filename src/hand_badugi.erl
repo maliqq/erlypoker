@@ -1,14 +1,25 @@
--define(BADUGI1, 9).
--define(BADUGI2, 10).
--define(BADUGI3, 11).
--define(BADUGI4, 12). %% complete badugi card
+-define(BADUGI_ONE, 9).
+-define(BADUGI_TWO, 10).
+-define(BADUGI_THREE, 11).
+-define(BADUGI_FOUR, 12). %% complete badugi card
+
+%%
+hand_badugi(Cards) when erlang:length(Cards) == 4 ->
+  hand_badugi(Cards, [fun is_badugi4/1, fun is_badugi3/1, fun is_badugi2/1, fun is_badugi1/1]).
+hand_badugi(_, []) ->
+  false;
+hand_badugi(Cards, [F|Tail]) when is_function(F) ->
+  case F(Cards) of
+    false -> hand_badugi(Cards, Tail);
+    Hand -> Hand
+  end.
 
 %%
 is_badugi4(Cards) ->
   case has_rainbow(Cards, 4) of
     true ->
       Highest = card:highest(Cards),
-      #hand{rank = {?BADUGI4, Highest#card.kind}, value = card:arrange_low(Cards)};
+      #hand{rank = {?BADUGI_FOUR, Highest#card.kind}, value = card:arrange_low(Cards)};
     _Else ->
       false
   end.
@@ -36,8 +47,8 @@ is_badugi3(Cards) ->
       false;
     _Then ->
       Highest = card:highest(Value),
-      #hand{rank = {?BADUGI3, Highest#card.kind}, value = card:arrange_low(Value)}
-  end.
+      #hand{rank = {?BADUGI_THREE, Highest#card.kind}, value = card:arrange_low(Value)}
+  end
 
 %% 3 cards same suit OR 3 cards same kind
 %% 2 cards same kind AND 2 cards same suit
@@ -78,7 +89,7 @@ is_badugi2(Cards) ->
       false;
     _Then ->
       Highest = card:highest(Value),
-      #hand{rank = {?BADUGI2, Highest#card.kind}, value = card:arrange_low(Value)}
+      #hand{rank = {?BADUGI_TWO, Highest#card.kind}, value = card:arrange_low(Value)}
   end.
 
 %% all cards same suit OR all cards same kind
@@ -86,7 +97,7 @@ is_badugi1(Cards) ->
   case has_paired(Cards, 4) or has_suited(Cards, 4) of
     true ->
       Lowest = card:lowest(Cards),
-      #hand{rank = {?BADUGI1, Lowest#card.kind}, value = Lowest};
+      #hand{rank = {?BADUGI_ONE, Lowest#card.kind}, value = Lowest};
     _Else ->
       false
   end.
@@ -124,16 +135,6 @@ has_rainbow_paired(Cards) ->
       [B | _] = lists:filter(fun(C) -> C#card.suit /= A#card_group.suit end, Cards),
       A#card_group.kind == B#card.kind
   end.
-%%
-badugi_hand(Cards) when erlang:length(Cards) == 4 ->
-  badugi_hand(Cards, [fun is_badugi4/1, fun is_badugi3/1, fun is_badugi2/1, fun is_badugi1/1]).
-badugi_hand(_, []) ->
-  false;
-badugi_hand(Cards, [F|Tail]) when is_function(F) ->
-  case F(Cards) of
-    false -> badugi_hand(Cards, Tail);
-    Hand -> Hand
-  end.
 
-badugi_hand_test() ->
-  io:format("~ts~n", [to_string(badugi_hand(card:wrap("2d3c4s4s")))]).
+hand_badugi_test() ->
+  io:format("~ts~n", [to_string(hand_badugi(card:wrap("2d3c4s4s")))]).
