@@ -5,9 +5,9 @@
 -include("poker.hrl").
 -include("card.hrl").
 -include("hand.hrl").
--include("hand_high.erl").
--include("hand_badugi.erl").
--include("hand_low.erl").
+-include("hand/high.erl").
+-include("hand/badugi.erl").
+-include("hand/low.erl").
 
 %%
 hand(high, Cards) ->
