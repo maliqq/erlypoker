@@ -24,57 +24,6 @@ mix(Type) when Type == ?MIX7 ->
 mix(Type) when Type == ?MIXED_DRAW ->
   {[?BADUGI, ?CARD5, ?SINGLE27, ?TRIPLE27], ?FIXED_LIMIT}.
 
-%% games stages for specified game type
-stages(Type) when Type band ?HOLDEM == ?HOLDEM ->
-  [
-    antes,
-    blinds,
-    {street,  "preflop",      [{deal, hole}, bets]},
-    {street,  "flop",         [{deal, board, 3}, bets]},
-    {street,  "turn",         [{deal, board, 1}, bets]},
-    {street,  "river",        [{deal, board, 1}, bets]},
-    showdown
-  ];
-stages(Type) when Type band ?CARD7 == ?CARD7 ->
-  [
-    antes,
-    {street,  "third",        [{deal, hole, 2}, {deal, door, 1}, bring_in, bets]},
-    {street,  "fourth",       [{deal, door, 1}, bets]},
-    big_bets,
-    {street,  "fifth",        [{deal, door, 1}, bets]},
-    {street,  "sixth",        [{deal, door, 1}, bets]},
-    {street,  "seventh",      [{deal, hole, 1}, bets]},
-    showdown
-  ];
-stages(Type) when Type band ?SINGLE_DRAW == ?SINGLE_DRAW ->
-  [
-    antes,
-    blinds,
-    {street,  "predraw",      [{deal, hole}, bets]},
-    {street,  "draw",         [discards, bets]},
-    showdown
-  ];
-stages(Type) when Type band ?TRIPLE_DRAW == ?TRIPLE_DRAW ->
-  [
-    antes,
-    blinds,
-    {street,  "predraw",      [{deal, hole}, bets]},
-    {street,  "first_draw",   [discards, bets]},
-    {street,  "second_draw",  [discards, bets]},
-    {street,  "third_draw",   [discards, bets]},
-    showdown
-  ].
-
-%%
-globals() ->
-  [
-    %% bet sizing
-    {cap,           4},
-    {small_blind,   0.5},
-    {big_bet,       2},
-    {ante,          0.125},
-    {bring_in,      0.25}
-  ].
 
 %% game default options for specific game type
 defaults(Type) when Type band ?CARD7 == ?CARD7 ->

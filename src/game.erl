@@ -2,8 +2,7 @@
 -export([new/2, mix/1, stages/1, globals/0, defaults/1, options/1]).
 
 -include("game.hrl").
--include("game_settings.erl").
--include("game_rules.erl").
+-include("game/settings.erl").
 
 %%
 new(Type, Limit) ->

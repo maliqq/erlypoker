@@ -30,6 +30,17 @@
 -define(DOUBLE_REBUY, 15).
 -define(ADDON, 18).
 
+%%
+sizing_in_big_blinds() ->
+  [
+  %% bet sizing
+  {cap,           4},
+  {small_blind,   0.5},
+  {big_bet,       2},
+  {ante,          0.125},
+  {bring_in,      0.25}
+  ].
+
 to_string(Bet, Data) when is_record(Bet, bet), Bet#bet.all_in =:= true ->
   lists:flatten(io_lib:format("~s (all in)", [lists:flatten(to_string(Data))]));
 to_string(Bet, Data) ->
