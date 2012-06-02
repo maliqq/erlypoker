@@ -1,5 +1,5 @@
 
--module(poker_sup).
+-module(server_sup).
 
 -behaviour(supervisor).
 

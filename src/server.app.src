@@ -1,12 +1,14 @@
-{application, poker,
+{application, server,
  [
   {description, ""},
   {vsn, "1"},
   {registered, []},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+									cowboy,
+									riakc
                  ]},
-  {mod, { poker_app, []}},
+  {mod, { server_app, []}},
   {env, []}
  ]}.
