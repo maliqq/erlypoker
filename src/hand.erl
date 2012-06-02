@@ -1,14 +1,6 @@
 -module(hand).
 
--export([main/0, to_string/1, high_card/1, badugi_hand/1, ace5_low/1, ace5_low8/1, ace6_low/1, deuce7_low/1]).
-
--record(hand, {
-    id,
-    rank,
-    value,
-    high = none,
-    kicker = []
-  }).
+-export([main/0, to_string/1, hand/2, compare/3]).
 
 -include("poker.hrl").
 -include("card.hrl").
@@ -34,20 +26,8 @@ compare(Low, Hand1, Hand2) ->
   compare_low(Low, Hand1, Hand2).
 
 %%
-to_string(Hand) ->
-  case Hand of
-    false -> false;
-    _Else ->
-      {N, W} = Hand#hand.rank,
-      {_, Name} = lists:keyfind(N, 1, ?NAMES),
-      What = if
-        N == ?FLUSH ->
-          card:suit_to_string(W);
-        true ->
-          card:kind_to_string(W)
-      end,
-      io_lib:format("~s (~s) [~ts ]", [Name, What, card:to_string(Hand#hand.value)])
-  end.
+to_string(_) ->
+  ok.
 
 main() ->
   {_, [[Arg]]} = init:get_argument(cards),
