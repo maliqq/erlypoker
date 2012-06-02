@@ -2,7 +2,6 @@
 
 -export([new/1]).
 
--include("poker.hrl").
 -include("game.hrl").
 -include_lib("eunit/include/eunit.hrl").
 

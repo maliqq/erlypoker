@@ -9,7 +9,6 @@
     main/1
   ]).
 
--include("poker.hrl").
 -include("card.hrl").
 -include_lib("eunit/include/eunit.hrl").
 

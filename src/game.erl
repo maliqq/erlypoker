@@ -3,6 +3,7 @@
 
 -include("game.hrl").
 -include("game/settings.erl").
+-include("game/stages.erl").
 
 %%
 new(Type, Limit) ->

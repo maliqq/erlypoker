@@ -9,7 +9,6 @@
     dealt = [] %% dealt cards
   }).
 
--include("poker.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 %% blank deal
