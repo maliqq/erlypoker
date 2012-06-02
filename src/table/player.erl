@@ -1,14 +1,9 @@
--module(player).
--export([add/3]).
-
 -define(MAX_WAITING, 100).
-
--include("poker.hrl").
 
 json_data(Player) ->
   {}.
 
-add(T, P, Position) when is_record(T, table) ->
+add_player(T, P, Position) when is_record(T, table) ->
   Table = remove_waiting(T, P),
   Player = P#player{state = ?WAIT},
   Players = gb_trees:insert(Player#player.id, Position, Table#table.players),

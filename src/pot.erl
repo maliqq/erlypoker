@@ -1,6 +1,6 @@
 %% pot manipulations - append, split
 -module(pot).
--export([test/0, new/0, append/3, is_active/1]).
+-export([new/0, append/3, json_data/1, is_active/1]).
 
 -record(side_pot, {
     amount = 0,
@@ -20,15 +20,17 @@
 new_side() ->
   #side_pot{members = orddict:new()}.
 
+%%
 new() ->
   #pot{main = new_side()}.
 
+%%
 json_data(Pot) when is_record(Pot, side_pot) ->
-  .
-
+  "";
 json_data(Pot) when is_record(Pot, pot) ->
-  .
+  "".
 
+%%
 to_string(Pot) when is_record(Pot, side_pot) ->
   io_lib:format("(total = ~p cap=~p members = ~p)", [total(Pot), Pot#side_pot.cap, Pot#side_pot.members]);
 
@@ -37,12 +39,15 @@ to_string(Pot) when is_record(Pot, pot) ->
     string:join(lists:map(fun(P) -> to_string(P) end, Pot#pot.side), "")
     ]).
 
+%%
 is_active(Pot) when is_record(Pot, side_pot) ->
   (orddict:size(Pot#side_pot.members) > 0) and (total(Pot) > 0).
 
+%%
 release(Pot) when is_record(Pot, side_pot) ->
   Pot#side_pot{amount = total(Pot)}.
 
+%%
 total(Pot) when is_record(Pot, side_pot) ->
   orddict:fold(fun(_, Amount, Total) -> Total + Amount end, 0, Pot#side_pot.members);
 
@@ -56,9 +61,11 @@ total(Pot) when is_record(Pot, pot) ->
     end
   end, 0, side_pots(Pot)).
 
+%%
 side_pots(Pot) when is_record(Pot, pot) ->
   [Pot#pot.main] ++ Pot#pot.side.
 
+%%
 append(P, Member, Amount) when is_record(P, side_pot) ->
   Pot = with_member(Member, P),
 
@@ -80,6 +87,7 @@ append(P, Member, Amount) when is_record(P, side_pot) ->
 append(Pot, Member, Amount) when is_record(Pot, pot) ->
   append(Pot, Member, Amount, false).
 
+%%
 with_member(Member, P) when is_record(P, side_pot) ->
   case orddict:is_key(Member, P#side_pot.members) of %% check member
     false ->
@@ -88,6 +96,7 @@ with_member(Member, P) when is_record(P, side_pot) ->
       P
   end.
 
+%%
 split(Pot, Member) when is_record(Pot, pot) ->
   Current = Pot#pot.main,
   %%Current = C#side_pot{members = orddict:update_counter(Member, Balance, C#side_pot.members)},
@@ -114,6 +123,7 @@ split(Pot, Member) when is_record(Pot, pot) ->
 
   Pot#pot{main = NewPot, side = lists:append(Pot#pot.side, [OldPot])}.
 
+%%
 append(Pot, Member, Amount, Cap) when is_record(Pot, pot) ->
   {[_|Side], Balance} = lists:mapfoldl(fun(P, B) ->
     {P1, N} = append(P, Member, Amount),
@@ -133,6 +143,7 @@ append(Pot, Member, Amount, Cap) when is_record(Pot, pot) ->
       P
   end.
 
+%%
 pot_test() ->
   Pot = new(),
   Pot1 = append(Pot, "A", 27, true),
