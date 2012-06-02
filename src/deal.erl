@@ -1,6 +1,6 @@
 -module(deal).
 
--export([new/0]).
+-export([new/0, new/1, deal/3, to_string/1, json_data/1]).
 
 -record(deal, {
     id,
@@ -9,9 +9,11 @@
     stage,
     dealer,
     players,
+    positions,
     betting, pot, showdown, results, timing
   }).
 
+-include("table.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 new() ->
@@ -24,26 +26,26 @@ new(Table) when is_record(Table, table) ->
     game = Table#table.game,
     players = lists:map(fun(Seat) -> Seat#seat.player end, Seats),
     positions = lists:map(fun(Seat) ->
-      {Seat#seat.index, Seat#seat.chips, seat#seat.player_id}
+      {Seat#seat.index, Seat#seat.chips, Seat#seat.player}
     end, Seats)
   }.
 
-deal(hole, N, Deal) ->
+deal(hole, _, _) ->
+  ok;
+
+deal(door, _, _) ->
+  ok;
+
+deal(open, _, _) ->
+  ok;
+
+deal(board, _, _) ->
   ok.
 
-deal(door, N, Deal) ->
-  ok.
-
-deal(open, N, Deal) ->
-  ok.
-
-deal(board, N, Deal) ->
-  ok.
-
-to_string(Deal) ->
+to_string(_) ->
   "".
 
-json_data(Deal) ->
+json_data(_) ->
   {}.
 
 deal_test() ->

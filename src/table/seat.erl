@@ -1,28 +1,22 @@
 %%
--module(seat).
-
--export([create/1, reserve/3, take/4, take/3, join/3, buy_in/3]).
-
--include("poker.hrl").
--include_lib("eunit/include/eunit.hrl").
-
-create(Max) ->
+create_seats(Max) ->
   Seats = erlang:make_tuple(Max, none),
   create(Seats, Max).
 
-create(Seats, 0) ->
+create_seats(Seats, 0) ->
   Seats;
 
-create(Seats, Index) ->
+create_seats(Seats, Index) ->
   Seat = #seat{
     player = none,
     chips = 0,
     index = Index,
     state = ?EMPTY
   },
-  create(setelement(Index, Seats, Seat), Index - 1).
+  create_seats(setelement(Index, Seats, Seat), Index - 1).
 
-reserve(Table, Player, Position) when is_record(Table, table) ->
+%%
+reserve_seat(Table, Player, Position) when is_record(Table, table) ->
   Seat = element(Position, Table#table.seats),
   if
     Seat#seat.state == ?EMPTY ->
@@ -38,6 +32,7 @@ reserve(Table, Player, Position) when is_record(Table, table) ->
       {taken, Table}
   end.
 
+%%
 sit(Table, Player, Position, Amount) when is_record(Table, table) ->
   Seat = element(Position, Table#table.seats),
   if
@@ -55,15 +50,17 @@ sit(Table, Player, Position, Amount) when is_record(Table, table) ->
       {taken, Table}
   end.
 
+%%
 sit(Table, Player, Position) when is_record(Table, table) ->
   if
     Table#table.type =:= ?TBL_BATTLE ->
       Balance = Player#player.balance,
       sit(Table, Player, Position, Balance#balance.buy_in);
     true ->
-      reserve(Table, Player, Position)
+      reserve_seat(Table, Player, Position)
   end.
 
+%%
 join(T, Player, Position) when is_record(T, table) ->
   {Result, Table} = take(T, Player, Position),
   if
@@ -73,6 +70,7 @@ join(T, Player, Position) when is_record(T, table) ->
       {Result, Table}
   end.
 
+%%
 buy_in(Table, Player, Amount) when is_record(Table, table) ->
   Position = gb_trees:get(Player#player.id, Table#table.players),
   Seat = element(Position, Table#table.seats),
@@ -90,6 +88,7 @@ buy_in(Table, Player, Amount) when is_record(Table, table) ->
       {error, Table}
   end.
 
+%%
 seat_test() ->
   ?assertEqual(3, erlang:tuple_size(create(3))),
   Seat = element(1, create(3)),

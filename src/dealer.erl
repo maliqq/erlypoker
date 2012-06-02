@@ -1,5 +1,5 @@
 -module(dealer).
--export([run/0, new/0, burn/2, discard/2, hole/2, board/2, deal/3, reshuffle/1]).
+-export([new/0, burn/2, discard/2, hole/2, board/2, reshuffle/1]).
 
 %%
 -record(dealer, {
@@ -17,11 +17,11 @@ new() ->
   #dealer{deck = card:deck()}.
 
 %%
-take(Dealer, Num) when is_record(Dealer, deal) ->
+take(Dealer, Num) when is_record(Dealer, dealer) ->
   lists:sublist(Dealer#dealer.deck, 1, Num).
 
 %%
-burn(Dealer, Num) when is_record(Dealer, deal) ->
+burn(Dealer, Num) when is_record(Dealer, dealer) ->
   Burned = take(Dealer, Num),
   {Burned, Dealer#dealer{
     deck = Dealer#dealer.deck -- Burned,
@@ -35,7 +35,7 @@ reshuffle(Dealer) ->
   }.
 
 %%
-discard(Dealer, Cards) when is_record(Dealer, deal) ->
+discard(Dealer, Cards) when is_record(Dealer, dealer) ->
   New = take(Dealer, erlang:length(Cards)),
   {New, Dealer#dealer{
     deck = Dealer#dealer.deck -- New,
@@ -44,7 +44,7 @@ discard(Dealer, Cards) when is_record(Dealer, deal) ->
   }}.
 
 %%
-hole(Dealer, Num) when is_record(Dealer, deal) ->
+hole(Dealer, Num) when is_record(Dealer, dealer) ->
   Cards = take(Dealer, Num),
   {Cards, Dealer#dealer{
     deck = Dealer#dealer.deck -- Cards,
@@ -52,7 +52,7 @@ hole(Dealer, Num) when is_record(Dealer, deal) ->
   }}.
 
 %%
-board(D, Num) when is_record(D, deal) ->
+board(D, Num) when is_record(D, dealer) ->
   {_, Dealer} = burn(D, 1), % burn one card
   Cards = take(Dealer, Num),
   {Cards, Dealer#dealer{
@@ -81,12 +81,3 @@ dealer_test() ->
   ?assertEqual([], Dealer4#dealer.burned -- Hole),
   {Board, Dealer5} = board(Dealer, 3),
   ?assertEqual([], Dealer5#dealer.board -- Board).
-
-main() ->
-  random:seed(erlang:now()),
-  io:format("new random deck: "),
-  Dealer = new(),
-  io:format("~ts~n", [card:to_string(Dealer#dealer.deck)]),
-  {Seats, _} = deal(Dealer, [#seat{}, #seat{}, #seat{}, #seat{}, #seat{}, #seat{}, #seat{}, #seat{}], 2),
-  lists:foreach(fun(Seat) -> io:format("Hand ~ts~n", [card:to_string(Seat#seat.cards)]) end, Seats),
-  io:format("~n").

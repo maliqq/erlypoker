@@ -1,4 +1,26 @@
--record(prize_pool, {
+-define(EMPTY, 1).
+-define(RESERVED, 2).
+-define(BUSY, 3).
+
+-record(seat, {
+    state = ?EMPTY,
+    index,
+    player,
+    chips,
+    cards,
+    timer,
+    action
+  }).
+
+-record(table, {
+    id,
+    game, type, state,
+    seats, players, waiting, watching,
+    max = 9,
+    current %% current deal
+  }).
+
+-record(prize, {
     amount,
     rebuys,
     addons,

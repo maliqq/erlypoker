@@ -37,9 +37,6 @@
 -define(PLAY, 5). %% currently in deal
 -define(ACTIVE, ?FOLD bor ?PLAY). %% active
 
--define(EMPTY, 1).
--define(RESERVED, 2).
--define(BUSY, 3).
 
 -record(chips, {
     play,
@@ -47,22 +44,6 @@
     cap
   }).
 
--record(seat, {
-    state = ?EMPTY,
-    player,
-    chips,
-    cards,
-    timer,
-    action
-  }).
-
--record(table, {
-    id,
-    game, type, state,
-    seats, players, waiting, watching,
-    max = 9,
-    current %% current deal
-  }).
 
 %% table types
 -define(NORMAL_TABLE, 1). %% cash game

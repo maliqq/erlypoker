@@ -6,6 +6,7 @@
 -include("game.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
+-include("table/seat.erl").
 -include("table/position.erl").
 
 new(Max) ->
