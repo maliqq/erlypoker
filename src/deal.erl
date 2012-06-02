@@ -29,13 +29,10 @@ new(Table) when is_record(Table, table) ->
   }.
 
 to_string(Deal) ->
-  .
+  "".
 
 json_data(Deal) ->
-  .
-
-start(Game, Seats) ->
-  .
+  {}.
 
 deal_test() ->
-  .
+  ok.

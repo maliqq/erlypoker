@@ -26,7 +26,9 @@
 -define(MIDDLE_CONNECTOR, 8). %% T9 98 87 76
 -define(LOW_CONNECTOR, 9).    %% 65 54 43 32
 
--define(GAP_CONNECTOR, 10).
+-define(TOP_GAP, 10).
+-define(MIDDLE_GAP, 10).
+-define(LOW_GAP, 10).
 
 -define(ANY_PAIR, ?TOP_PAIR bor ?MIDDLE_PAIR bor ?LOW_PAIR).
 -define(ANY_ACE, ?TOP_ACE bor ?MIDDLE_ACE bor ?LOW_ACE).

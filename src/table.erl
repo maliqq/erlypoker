@@ -10,40 +10,22 @@ new(Max) ->
 	#table{seats = seat:create(Max), players = gb_trees:empty(), waiting = gb_sets:empty()}.
 
 json_data(Table) ->
-	.
+	{}.
 
 increase_blinds(Table, Blinds, Ante) ->
-	cast_message({
-		blinds, increase, []
-	}).
+	ok.
 
 next_deal(Table) ->
-	cast_message({
-		deal, start, deal:json_data(Deal)
-	}).
+	ok.
 
 switch_game(Table, Game) ->
-	cast_message({
-		game, switch, game:json_data(Game)
-	}).
-
-cast_message(Table) ->
-	.
-
-emit_message(Table, Player) ->
-	.
+	ok.
 
 close(Table) ->
-	Table#table{state = closed},
-	cast_message({
-		table, close
-	}).
+	ok.
 
 pause(Table) ->
-	Table#table{state = paused},
-	cast_message({
-		table, pause
-	}).
+	ok.
 
 table_test() ->
 	.
