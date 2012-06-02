@@ -1,7 +1,13 @@
 %%
 
 hand_badugi(Cards) when erlang:length(Cards) == 4 ->
-  hand_badugi(new(Cards), [fun is_badugi4/1, fun is_badugi3/1, fun is_badugi2/1, fun is_badugi1/1]).
+  hand_badugi(
+    new(Cards), [
+      fun is_badugi4/1,
+      fun is_badugi3/1,
+      fun is_badugi2/1,
+      fun is_badugi1/1
+    ]).
 
 hand_badugi(_, []) ->
   false;
