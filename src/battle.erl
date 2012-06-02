@@ -1,3 +1,0 @@
--module(battle).
--include_lib("eunit/inlcude/eunit.erl").
--include("table.hrl").

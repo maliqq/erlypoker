@@ -1,5 +1,3 @@
--module(betting).
-
 antes(Context) ->
   Players = player:get_active(Deal#deal.players),
   Context#context{
