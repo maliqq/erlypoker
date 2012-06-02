@@ -31,14 +31,15 @@ is_badugi4(Hand) ->
 
 %% 2 cards same suit OR 2 cards same kind
 %% not paired cards are different suit
+test_badugi3(Hand) ->
+  {
+  has_paired(Hand, 2) and not_suited(Hand) or
+  has_rainbow(Hand, 3) and not has_rainbow_paired(Hand),
+  has_suited(Hand, 2) and not_paired(Hand)
+  }.
+
 is_badugi3(Hand) ->
-  Value = case {
-  
-      has_paired(Hand, 2) and not_suited(Hand) or has_rainbow(Hand, 3) and not has_rainbow_paired(Hand),
-      has_suited(Hand, 2) and not_paired(Hand)
-  
-  } of
-  
+  Value = case test_badugi3(Hand) of
     {true, _} -> %% AsAhJd3c
   
       [Paired | _] = [G || G <- Hand#hand.kinds, erlang:length(G) == 2],
@@ -65,16 +66,15 @@ is_badugi3(Hand) ->
 %% 3 cards same suit OR 3 cards same kind
 %% 2 cards same kind AND 2 cards same suit
 %% not paired cards are same suit 
+test_badugi2(Hand) ->
+  {
+  has_paired(Hand, 3), has_suited(Hand, 3),
+  has_paired(Hand, 2) and has_suited(Hand, 2),
+  has_rainbow(Hand, 3) and has_rainbow_paired(Hand)
+  }.
+
 is_badugi2(Hand) ->
-  Value = case {
-  
-      has_paired(Hand, 3),
-      has_suited(Hand, 3),
-      has_paired(Hand, 2) and has_suited(Hand, 2),
-      has_rainbow(Hand, 3) and has_rainbow_paired(Hand)
-  
-  } of
-    
+  Value = case test_badugi2(Hand) of
     {true, _, _, _} -> %% 2s2h2dAc
     
       [ThreeKind | _] = repeats(Hand#hand.kinds, 3),
@@ -115,15 +115,17 @@ is_badugi2(Hand) ->
     false ->
       false;
     _Then ->
-      #hand{rank = ?BADUGI_TWO, high = card:highers(Value), value = card:arrange_low(Value)}
+      Hand#hand{rank = ?BADUGI_TWO, high = card:highers(Value), value = card:arrange_low(Value)}
   end.
 
 %% all cards same suit OR all cards same kind
 is_badugi1(Hand) ->
   case has_paired(Hand, 4) or has_suited(Hand, 4) of
     true ->
+      
       Lowest = card:lowest(Hand#hand.cards),
-      #hand{rank = ?BADUGI_ONE, high = Lowest, value = [Lowest]};
+      Hand#hand{rank = ?BADUGI_ONE, high = Lowest, value = [Lowest]};
+    
     _Else ->
       false
   end.
