@@ -1,0 +1,12 @@
+{application, poker,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { poker_app, []}},
+  {env, []}
+ ]}.
