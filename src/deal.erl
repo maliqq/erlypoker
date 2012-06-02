@@ -28,6 +28,18 @@ new(Table) when is_record(Table, table) ->
     end, Seats)
   }.
 
+deal(hole, N, Deal) ->
+  ok.
+
+deal(door, N, Deal) ->
+  ok.
+
+deal(open, N, Deal) ->
+  ok.
+
+deal(board, N, Deal) ->
+  ok.
+
 to_string(Deal) ->
   "".
 
