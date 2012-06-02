@@ -1,4 +1,6 @@
 *.beam
 erl_crash.dump
+deps/**/*
+
 
 
