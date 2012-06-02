@@ -1,10 +1,11 @@
 %%
 -define(ACE, 12).
+-define(ACE_LOW, 0).
 
 %%
 -define(kinds(), lists:seq(0, ?ACE)).
 -define(suits(), lists:seq(0, 3)).
--define(cards(), [card(Kind, Suit) || Kind <- kinds(), Suit <- suits()]).
+-define(cards(), [?card(Kind, Suit) || Kind <- ?kinds(), Suit <- ?suits()]).
 
 %%
 -define(kind(Mask), (Mask bsr 2)).
