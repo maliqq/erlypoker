@@ -38,7 +38,7 @@ reserve(Table, Player, Position) when is_record(Table, table) ->
       {taken, Table}
   end.
 
-take(Table, Player, Position, Amount) when is_record(Table, table) ->
+sit(Table, Player, Position, Amount) when is_record(Table, table) ->
   Seat = element(Position, Table#table.seats),
   if
     Seat#seat.state =:= ?EMPTY ->
@@ -55,11 +55,11 @@ take(Table, Player, Position, Amount) when is_record(Table, table) ->
       {taken, Table}
   end.
 
-take(Table, Player, Position) when is_record(Table, table) ->
+sit(Table, Player, Position) when is_record(Table, table) ->
   if
     Table#table.type =:= ?TBL_BATTLE ->
       Balance = Player#player.balance,
-      take(Table, Player, Position, Balance#balance.buy_in);
+      sit(Table, Player, Position, Balance#balance.buy_in);
     true ->
       reserve(Table, Player, Position)
   end.
