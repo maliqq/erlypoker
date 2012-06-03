@@ -41,7 +41,7 @@
 -define(ADDON, 18).
 
 %%
--define(?sizing, [
+-define(sizing(), [
     %% bet sizing
     {cap,           4},
     {small_blind,   0.5},

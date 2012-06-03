@@ -25,3 +25,8 @@
     rows, kinds, suits,
     high = none, value = [], kickers = []
   }).
+
+-include("hand/high.hrl").
+-include("hand/badugi.hrl").
+-include("hand/low.hrl").
+

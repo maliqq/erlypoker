@@ -1,8 +1,6 @@
-antes(Context) ->
+antes(Deal) ->
   Players = player:get_active(Deal#deal.players),
-  Context#context{
-    deal = post_antes(Deal, Context#context.ante, Players)
-  }.
+  post_antes(Deal, Players).
 
 post_antes(Deal, []) ->
   Deal;

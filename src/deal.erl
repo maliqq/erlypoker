@@ -2,17 +2,7 @@
 
 -export([new/0, new/1, deal/3, to_string/1, json_data/1]).
 
--record(deal, {
-    id,
-    game,
-    start,
-    stage,
-    dealer,
-    players,
-    positions,
-    betting, pot, showdown, results, timing
-  }).
-
+-include("poker.hrl").
 -include("table.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
@@ -49,4 +39,5 @@ json_data(_) ->
   {}.
 
 deal_test() ->
-  ok.
+  Deal = new()
+  .

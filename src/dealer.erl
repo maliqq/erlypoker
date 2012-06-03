@@ -27,6 +27,7 @@ burn(Dealer, Num) when is_record(Dealer, dealer) ->
     burned = Dealer#dealer.burned ++ Burned
   }}.
 
+%%
 reshuffle(Dealer) ->
   Dealer#dealer{
     deck = card:shuffle(Dealer#dealer.deck ++ Dealer#dealer.burned),
@@ -79,4 +80,5 @@ dealer_test() ->
 
   ?assertEqual([], Dealer4#dealer.burned -- Hole),
   {Board, Dealer5} = board(Dealer, 3),
-  ?assertEqual([], Dealer5#dealer.board -- Board).
+  ?assertEqual([], Dealer5#dealer.board -- Board)
+  .

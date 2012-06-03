@@ -57,30 +57,27 @@ kind_index(Kind) ->
   string:str(?kind_chars(), Kind) - 1.
 
 %% card
-
 new(Card) ->
   wrap(Card).
 new(Kind, Suit) when is_integer(Kind), is_integer(Suit) ->
   ?card(Kind, Suit);
 new(Kind, Suit) ->
   new(kind_index(Kind), suit_index(Suit)).
-
-%%
 parse(Binary) when is_binary(Binary) ->
   [wrap(Byte) || Byte <- binary:bin_to_list(Binary)];
 parse(String) ->
   {_, Result} = re:run(String, "([akqjt2-9]{1})([shdc]{1})", [global, caseless, {capture, [1, 2], list}]),
   lists:map(fun([Kind, Suit]) -> new(Kind, Suit) end, Result).
-
-%%
 wrap(Card) when is_integer(Card) ->
   Card;
 wrap(Card) when is_tuple(Card) ->
   {Kind, Suit} = Card,
   new(Kind, Suit);
-wrap(String) ->
+wrap(String) when is_list(String), erlang:length(String) == 2 ->
   [Kind, Suit] = re:split(String, "", [{return, list}, {parts, 2}]),
-  new(Kind, Suit).
+  new(Kind, Suit);
+wrap(String) ->
+  parse(String).
 
 %%
 to_string(Kind, Suit) ->
@@ -89,12 +86,8 @@ to_string(Card) when is_integer(Card) ->
   to_string(?kind(Card), ?suit(Card));
 to_string(Cards) when is_list(Cards) ->
   string:join(lists:map(fun(Card) -> to_string(Card) end, Cards), "").
-
-%%
 to_binary(Cards) ->
   binary:list_to_bin([wrap(Card) || Card <- Cards]).
-
-%%
 to_tuple(Card) when is_integer(Card) ->
   {?kind(Card), ?suit(Card)}.
 

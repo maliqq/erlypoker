@@ -1,7 +1,7 @@
 %%
 create_seats(Max) ->
   Seats = erlang:make_tuple(Max, none),
-  create(Seats, Max).
+  create_seats(Seats, Max).
 
 create_seats(Seats, 0) ->
   Seats;
@@ -53,7 +53,7 @@ sit(Table, Player, Position, Amount) when is_record(Table, table) ->
 %%
 sit(Table, Player, Position) when is_record(Table, table) ->
   if
-    Table#table.type =:= ?TBL_BATTLE ->
+    Table#table.type =:= ?BATTLE_TABLE ->
       Balance = Player#player.balance,
       sit(Table, Player, Position, Balance#balance.buy_in);
     true ->
@@ -62,7 +62,7 @@ sit(Table, Player, Position) when is_record(Table, table) ->
 
 %%
 join(T, Player, Position) when is_record(T, table) ->
-  {Result, Table} = take(T, Player, Position),
+  {Result, Table} = sit(T, Player, Position),
   if
     Result == ok ->
       {Result, player:add(Table, Player, Position)};
@@ -87,35 +87,3 @@ buy_in(Table, Player, Amount) when is_record(Table, table) ->
     true ->
       {error, Table}
   end.
-
-%%
-seat_test() ->
-  ?assertEqual(3, erlang:tuple_size(create(3))),
-  Seat = element(1, create(3)),
-  ?assertEqual(seat, element(1, Seat)),
-
-  T = table:new(6),
-
-  Player1 = #player{id = 1, name = "maliqq"},
-  Player2 = #player{id = 2, name = "k8ldykbala"},
-
-  Seat = element(1, T#table.seats),
-  ?assertEqual(?EMPTY, Seat#seat.state),
-
-  {Result, T1} = join(T, Player1, 1),
-
-  Seat1 = element(1, T1#table.seats),
-  ?assertEqual(?RESERVED, Seat1#seat.state),
-
-  ?assertEqual(ok, Result),
-
-  {Result, T2} = buy_in(T1, Player1, 10000),
-
-  ?assertEqual(ok, Result),
-  Seat2 = element(1, T2#table.seats),
-  ?assertEqual(10000, Seat2#seat.chips),
-  ?assertEqual(?BUSY, Seat2#seat.state),
-
-  {Result3, T3} = join(T1, Player2, 1),
-  ?assertEqual(taken, Result3)
-  .

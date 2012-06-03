@@ -1,0 +1,8 @@
+---
+language: erlang
+otp_release:
+  - R14B04
+notifications:
+  email:
+    recipients:
+      - malikbakt@gmail.com

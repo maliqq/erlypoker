@@ -27,7 +27,7 @@
 -define(WAIT, 1). %% waiting next deal or BB
 -define(IDLE, 2). %% sit out
 -define(AWAY, 3). %% disconnected
--define(FOLD, 4). %% folded hand
+-define(FOLDED, 4). %% folded hand
 -define(PLAY, 5). %% currently in deal
 -define(ACTIVE, ?FOLD bor ?PLAY). %% active
 
@@ -53,7 +53,7 @@
     id,
     game, type, state,
     seats, players, waiting, watching,
-    max = 9,
+    max = 9, button = 0,
     current %% current deal
   }).
 
@@ -92,3 +92,8 @@
     tables,
     players
   }).
+
+-include("table/position.hrl").
+-include("table/seat.hrl").
+-include("table/player.hrl").
+

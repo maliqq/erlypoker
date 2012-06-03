@@ -6,7 +6,7 @@
 
 to_string(Bet, Data) when is_record(Bet, bet), Bet#bet.all_in =:= true ->
   lists:flatten(io_lib:format("~s (all in)", [lists:flatten(to_string(Data))]));
-to_string(Bet, Data) ->
+to_string(_, Data) ->
   lists:flatten(to_string(Data)).
 
 to_string({?ANTE, N}) ->
