@@ -6,8 +6,9 @@
   {applications, [
                   kernel,
                   stdlib,
-									cowboy,
-									riakc
+                  riakc,
+                  mongodb,
+									cowboy
                  ]},
   {mod, { server_app, []}},
   {env, []}
