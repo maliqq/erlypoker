@@ -2,8 +2,6 @@
 language: erlang
 otp_release:
   - R14B04
-before_install:
-	- rebar clean
 notifications:
   email:
     recipients:
