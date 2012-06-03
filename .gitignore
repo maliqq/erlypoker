@@ -4,5 +4,3 @@ deps/**/*
 ebin/server.app
 .eunit
 
-
-
