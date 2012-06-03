@@ -2,6 +2,7 @@
 language: erlang
 otp_release:
   - R14B04
+script: "rebar clean && rebar get-deps"
 notifications:
   email:
     recipients:
