@@ -2,6 +2,8 @@
 language: erlang
 otp_release:
   - R14B04
+before_script:
+	- rebar clean
 notifications:
   email:
     recipients:
