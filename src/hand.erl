@@ -33,5 +33,5 @@ main() ->
   Cards = card:wrap(Arg),
   {_, [[Rank]]} = init:get_argument(rank),
   Hand = hand(list_to_atom(Rank), Cards),
-  io:format(to_string(Hand)),
+  io:format(format(Hand)),
   io:format("~n").
