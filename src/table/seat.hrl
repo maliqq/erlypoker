@@ -65,7 +65,7 @@ join(T, Player, Position) when is_record(T, table) ->
   {Result, Table} = sit(T, Player, Position),
   if
     Result == ok ->
-      {Result, player:add(Table, Player, Position)};
+      {Result, add_player(Table, Player, Position)};
     true ->
       {Result, Table}
   end.

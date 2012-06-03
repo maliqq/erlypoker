@@ -53,7 +53,7 @@
     id,
     game, type, state,
     seats, players, waiting, watching,
-    max = 9, button = 0,
+    max = 9, button = 1,
     current %% current deal
   }).
 

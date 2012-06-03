@@ -2,9 +2,12 @@
 
 -export([main/0, to_string/1, hand/2, compare/3]).
 
--include("poker.hrl").
 -include("card.hrl").
 -include("hand.hrl").
+-include("hand/high.hrl").
+-include("hand/badugi.hrl").
+-include("hand/low.hrl").
+
 
 %%
 hand(high, Cards) ->

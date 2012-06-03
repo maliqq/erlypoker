@@ -7,7 +7,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 new(Max) ->
-	#table{seats = seat:create(Max), players = gb_trees:empty(), waiting = gb_sets:empty()}.
+	#table{seats = create_seats(Max), players = gb_trees:empty(), waiting = gb_sets:empty()}.
 
 json_data(Table) ->
 	{}.

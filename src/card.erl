@@ -80,8 +80,10 @@ wrap(String) ->
   parse(String).
 
 %%
-to_string(Kind, Suit) ->
+to_utf8_string(Kind, Suit) ->
   lists:flatten(io_lib:format("~s~ts", [kind_to_char(Kind), suit_to_utf8(Suit)])).
+to_string(Kind, Suit) ->
+  string:join([kind_to_char(Kind), suit_to_char(Suit)], "").
 to_string(Card) when is_integer(Card) ->
   to_string(?kind(Card), ?suit(Card));
 to_string(Cards) when is_list(Cards) ->
@@ -95,7 +97,7 @@ to_tuple(Card) when is_integer(Card) ->
 index(low, Card) ->
   kind_index(low, ?kind(wrap(Card))).
 index(Card) ->
-  index(Card, false).
+  kind_index(?kind(wrap(Card))).
 
 %%
 compare(A, B) ->

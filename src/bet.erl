@@ -64,7 +64,7 @@ to_string(Bet) when is_record(Bet, bet), is_integer(Bet#bet.raise), Bet#bet.rais
 
 %% simple structure?
 
-bet_test() ->
+bet_test2() ->
   ?assertEqual("checks", to_string(#bet{})),
   ?assertEqual("folds", to_string(#bet{fold = true})),
   ?assertEqual("calls 40", to_string(#bet{call = 40})),
