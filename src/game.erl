@@ -9,7 +9,7 @@
 new(Type, Limit) ->
   #game{type = Type, limit = Limit}.
 
-to_string(Game) when is_record(Game, game) ->
+format(Game) when is_record(Game, game) ->
   io_lib:format("", []).
 
 game_test() ->

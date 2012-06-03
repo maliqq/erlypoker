@@ -1,6 +1,6 @@
 -module(deal).
 
--export([new/0, new/1, deal/3, to_string/1, json_data/1]).
+-export([new/0, new/1, deal/3, format/1, json_data/1]).
 
 -include("poker.hrl").
 -include("table.hrl").
@@ -32,7 +32,7 @@ deal(open, _, _) ->
 deal(board, _, _) ->
   ok.
 
-to_string(_) ->
+format(_) ->
   "".
 
 json_data(_) ->

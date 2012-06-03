@@ -1,7 +1,7 @@
 -module(card).
 
 -export([
-    new/1, new/2, parse/1, wrap/1, to_string/1, to_binary/1, to_tuple/1,
+    new/1, new/2, parse/1, wrap/1, format/1, to_binary/1, to_tuple/1,
     compare/2, compare_low/2, diff/2, diff/3, arrange/1, arrange/2, arrange_groups/1, arrange_groups/2,
     highest/1, lowest/1, kickers/2, kickers/3,
     group/2, split_rows/1, group_suits/1, group_kinds/1,
@@ -13,20 +13,20 @@
 -include_lib("eunit/include/eunit.hrl").
 
 %% suit
-suit_to_utf8(Suit) when is_integer(Suit) ->
+suit_utf8(Suit) when is_integer(Suit) ->
   lists:nth(Suit + 1, ?suit_utf8());
-suit_to_utf8(Suit) ->
-  suit_to_utf8(suit_index(Suit)).
+suit_utf8(Suit) ->
+  suit_utf8(suit_index(Suit)).
 
-suit_to_char(Suit) when is_integer(Suit) ->
+suit_char(Suit) when is_integer(Suit) ->
   string:substr(?suit_chars(), Suit + 1, 1);
-suit_to_char(Suit) ->
+suit_char(Suit) ->
   Suit.
 
-suit_to_string(Suit) when is_integer(Suit) ->
+suit_name(Suit) when is_integer(Suit) ->
   lists:nth(Suit + 1, ?suit_names());
-suit_to_string(Suit) ->
-  suit_to_string(suit_index(Suit)).
+suit_name(Suit) ->
+  suit_name(suit_index(Suit)).
 
 suit_index(Suit) when is_integer(Suit) ->
   Suit;
@@ -34,15 +34,15 @@ suit_index(Suit) ->
   string:str(?suit_chars(), Suit) - 1.
 
 %% kind
-kind_to_char(Kind) when is_integer(Kind) ->
+kind_char(Kind) when is_integer(Kind) ->
   string:substr(?kind_chars(), Kind + 1, 1);
-kind_to_char(Kind) ->
+kind_char(Kind) ->
   Kind.
 
-kind_to_string(Kind) when is_integer(Kind) ->
+kind_name(Kind) when is_integer(Kind) ->
   lists:nth(Kind + 1, ?kind_names());
-kind_to_string(Kind) ->
-  kind_to_string(kind_index(Kind)).
+kind_name(Kind) ->
+  kind_name(kind_index(Kind)).
 
 kind_index(low, Kind) ->
   Index = kind_index(Kind),
@@ -80,14 +80,14 @@ wrap(String) ->
   parse(String).
 
 %%
-to_utf8_string(Kind, Suit) ->
-  lists:flatten(io_lib:format("~s~ts", [kind_to_char(Kind), suit_to_utf8(Suit)])).
-to_string(Kind, Suit) ->
-  string:join([kind_to_char(Kind), suit_to_char(Suit)], "").
-to_string(Card) when is_integer(Card) ->
-  to_string(?kind(Card), ?suit(Card));
-to_string(Cards) when is_list(Cards) ->
-  string:join(lists:map(fun(Card) -> to_string(Card) end, Cards), "").
+format_utf8(Kind, Suit) ->
+  lists:flatten(io_lib:format("~s~ts", [kind_char(Kind), suit_utf8(Suit)])).
+format(Kind, Suit) ->
+  string:join([kind_char(Kind), suit_char(Suit)], "").
+format(Card) when is_integer(Card) ->
+  format(?kind(Card), ?suit(Card));
+format(Cards) when is_list(Cards) ->
+  string:join(lists:map(fun(Card) -> format(Card) end, Cards), "").
 to_binary(Cards) ->
   binary:list_to_bin([wrap(Card) || Card <- Cards]).
 to_tuple(Card) when is_integer(Card) ->
@@ -194,19 +194,19 @@ deck() ->
 suit_test() ->
   ?assertEqual(3, suit_index(3)),
   ?assertEqual(3, suit_index("c")),
-  ?assertEqual("d", suit_to_char(2)),
-  ?assertEqual("d", suit_to_char("d")),
-  ?assertEqual("spade", suit_to_string(0)),
-  ?assertEqual("spade", suit_to_string("s")),
-  ?assertEqual(<<"♥"/utf8>>, suit_to_utf8(1)),
-  ?assertEqual(<<"♥"/utf8>>, suit_to_utf8("h"))
+  ?assertEqual("d", suit_char(2)),
+  ?assertEqual("d", suit_char("d")),
+  ?assertEqual("spade", suit_name(0)),
+  ?assertEqual("spade", suit_name("s")),
+  ?assertEqual(<<"♥"/utf8>>, suit_utf8(1)),
+  ?assertEqual(<<"♥"/utf8>>, suit_utf8("h"))
   .
 %%
 kind_test() ->
-  ?assertEqual("K", kind_to_char(11)),
-  ?assertEqual("K", kind_to_char("K")),
-  ?assertEqual("queen", kind_to_string(10)),
-  ?assertEqual("queen", kind_to_string("Q")),
+  ?assertEqual("K", kind_char(11)),
+  ?assertEqual("K", kind_char("K")),
+  ?assertEqual("queen", kind_name(10)),
+  ?assertEqual("queen", kind_name("Q")),
   ?assertEqual(?ACE, kind_index(12)),
   ?assertEqual(?ACE_LOW, kind_index(low, 12)),
   ?assertEqual(11, kind_index("K")),
@@ -219,7 +219,7 @@ card_test() ->
   ?assertEqual(50, wrap("Ad")),
   ?assertEqual(50, wrap({"A", "d"})),
   ?assertEqual(50, wrap(new("A", "d"))),
-  ?assertEqual("Ad", to_string(50)),
+  ?assertEqual("Ad", format(50)),
   ?assertEqual({12, 2}, to_tuple(50)),
   ?assertEqual(0, index(low, new("A", "d"))),
   ?assertEqual(?ACE, index(new("A", "h")))
@@ -227,6 +227,6 @@ card_test() ->
 
 main(_) ->
   random:seed(erlang:now()),
-  io:format("~s~n", [to_string(deck())]),
+  io:format("~s~n", [format(deck())]),
   io:format("~ts~n", [to_binary(?cards())])
   .

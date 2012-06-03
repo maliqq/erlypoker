@@ -1,13 +1,12 @@
 -module(hand).
 
--export([main/0, to_string/1, hand/2, compare/3]).
+-export([main/0, format/1, hand/2, compare/3]).
 
 -include("card.hrl").
 -include("hand.hrl").
 -include("hand/high.hrl").
 -include("hand/badugi.hrl").
 -include("hand/low.hrl").
-
 
 %%
 hand(high, Cards) ->
@@ -26,7 +25,7 @@ compare(Low, Hand1, Hand2) ->
   compare_low(Low, Hand1, Hand2).
 
 %%
-to_string(_) ->
+format(_) ->
   ok.
 
 main() ->
