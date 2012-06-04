@@ -15,7 +15,6 @@ hand_badugi(H, [F|Tail]) when is_function(F) ->
   case F(H) of
     false ->
       hand_badugi(H, Tail);
-
     Hand ->
       Hand
   end.
@@ -29,7 +28,6 @@ is_badugi4(Hand) ->
   case has_rainbow(Hand, 4) of
     true ->
       Hand#hand{rank = ?BADUGI_FOUR, high = card:highest(Hand#hand.cards), value = card:arrange_low(Hand#hand.cards)};
-
     _Else ->
       false
   end.
@@ -38,9 +36,9 @@ is_badugi4(Hand) ->
 %% not paired cards are different suit
 test_badugi3(Hand) ->
   {
-  has_paired(Hand, 2) and not_suited(Hand) or
-  has_rainbow(Hand, 3) and not has_rainbow_paired(Hand),
-  has_suited(Hand, 2) and not_paired(Hand)
+    has_paired(Hand, 2) and not_suited(Hand) or
+    has_rainbow(Hand, 3) and not has_rainbow_paired(Hand),
+    has_suited(Hand, 2) and not_paired(Hand)
   }.
 
 is_badugi3(Hand) ->
@@ -73,9 +71,9 @@ is_badugi3(Hand) ->
 %% not paired cards are same suit 
 test_badugi2(Hand) ->
   {
-  has_paired(Hand, 3), has_suited(Hand, 3),
-  has_paired(Hand, 2) and has_suited(Hand, 2),
-  has_rainbow(Hand, 3) and has_rainbow_paired(Hand)
+    has_paired(Hand, 3), has_suited(Hand, 3),
+    has_paired(Hand, 2) and has_suited(Hand, 2),
+    has_rainbow(Hand, 3) and has_rainbow_paired(Hand)
   }.
 
 is_badugi2(Hand) ->
@@ -163,6 +161,7 @@ has_rainbow_paired(Hand) ->
     true ->
       false;
     _Else ->
+    
       Ged = [G || G <- Hand#hand.suits, erlang:length(G) > 1],
       
       A = hd(Ged),
