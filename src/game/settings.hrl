@@ -1,29 +1,49 @@
 %% mixed game options
 mix(Type) when Type == ?HORSE ->
-  {[?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8], ?FIXED_LIMIT};
-mix(Type) when Type == ?HOSE ->
-  {[?HOLDEM, ?OMAHA8, ?STUD, ?STUD8], ?FIXED_LIMIT};
-mix(Type) when Type == ?MIX8 -> %% 8-game
-  [
-    {[?TRIPLE27, ?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8], ?FIXED_LIMIT},
-    {?HOLDEM, ?NO_LIMIT},
-    {?OMAHA, ?POT_LIMIT}
-  ];
-mix(Type) when Type == ?MIX9 ->
-  [
-    {[?BADUGI, ?TRIPLE27, ?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8], ?FIXED_LIMIT},
-    {?HOLDEM, ?NO_LIMIT},
-    {?OMAHA, ?POT_LIMIT}
-  ];
-mix(Type) when Type == ?MIXED_HOLDEM ->
-  [{?HOLDEM, ?FIXED_LIMIT}, {?HOLDEM, ?NO_LIMIT}, {?OMAHA8, ?FIXED_LIMIT}, {?OMAHA, ?POT_LIMIT}];
-mix(Type) when Type == ?MIXED_STUD ->
-  {[?STUD, ?STUD8, ?RAZZ], ?FIXED_LIMIT};
-mix(Type) when Type == ?MIX7 ->
-  {[?STUD, ?STUD8, ?RAZZ, ?LONDON], ?FIXED_LIMIT};
-mix(Type) when Type == ?MIXED_DRAW ->
-  {[?BADUGI, ?CARD5, ?SINGLE27, ?TRIPLE27], ?FIXED_LIMIT}.
+  {fixed_limit, [?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8]};
 
+mix(Type) when Type == ?HOSE ->
+  {fixed_limit, [?HOLDEM, ?OMAHA8, ?STUD, ?STUD8]};
+
+mix(Type) when Type == ?EIGHT_GAME -> %% 8-game
+  [
+    {fixed_limit, [?TRIPLE27, ?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8]},
+    {no_limit, ?HOLDEM},
+    {pot_limit, ?OMAHA}
+  ];
+
+mix(Type) when Type == ?NINE_GAME ->
+  [
+    {fixed_limit, [?BADUGI, ?TRIPLE27, ?HOLDEM, ?OMAHA8, ?RAZZ, ?STUD, ?STUD8]},
+    {no_limit, ?HOLDEM},
+    {pot_limit, ?OMAHA}
+  ];
+
+mix(Type) when Type == ?MIXED_HOLDEM ->
+  [
+    {fixed_limit, ?HOLDEM},
+    {no_limit, ?HOLDEM},
+    {pot_limit, ?OMAHA8},
+    {pot_limit, ?OMAHA}
+  ];
+
+mix(Type) when Type == ?HOLDEM_OMAHA ->
+  [
+    {no_limit, ?HOLDEM},
+    {pot_limit, ?OMAHA}
+  ];
+
+mix(Type) when Type == ?MIXED_STUD ->
+  {fixed_limit, [?STUD, ?STUD8, ?RAZZ]};
+
+mix(Type) when Type == ?MIXED_SEVEN_CARD ->
+  {fixed_limit, [?STUD, ?STUD8, ?RAZZ, ?LONDON]};
+
+mix(Type) when Type == ?MIXED_DRAW ->
+  {fixed_limit, [?BADUGI, ?FIVE_CARD, ?SINGLE27, ?TRIPLE27]}.
+
+mix(Type) when Type == ?MIXED_FIVE_CARD ->
+  {fixed_limit, [?FIVE_CARD, ?SINGLE27, ?TRIPLE27]}.
 
 %% game default options for specific game type
 defaults(Type) when Type band ?CARD7 == ?CARD7 ->

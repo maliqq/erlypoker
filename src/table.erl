@@ -1,6 +1,6 @@
 -module(table).
 
--export([new/1]).
+-export([new/1, main/1]).
 
 -include("table.hrl").
 -include("game.hrl").
@@ -75,3 +75,7 @@ seat_test() ->
 
 table_test() ->
 	ok.
+
+main(_) ->
+  io:format("positions in 10max: ~p~n", [position_names(10)])
+  .

@@ -1,4 +1,12 @@
 %%
+new_seat() ->
+  #seat{
+    player = none,
+    chips = 0,
+    state = ?EMPTY
+  }.
+
+%%
 create_seats(Max) ->
   Seats = erlang:make_tuple(Max, none),
   create_seats(Seats, Max).
@@ -7,13 +15,8 @@ create_seats(Seats, 0) ->
   Seats;
 
 create_seats(Seats, Index) ->
-  Seat = #seat{
-    player = none,
-    chips = 0,
-    index = Index,
-    state = ?EMPTY
-  },
-  create_seats(setelement(Index, Seats, Seat), Index - 1).
+  Seat = new_seat(),
+  create_seats(setelement(Index, Seats, Seat#seat{index = Index}), Index - 1).
 
 %%
 reserve_seat(Table, Player, Position) when is_record(Table, table) ->

@@ -1,36 +1,25 @@
--define(SB, 1).
--define(BB, 2).
--define(UTG, 3).
--define(UTG1, 4).
--define(UTG2, 5).
--define(MP, 6).
--define(MP1, 7).
--define(MP2, 8).
--define(CO, 9).
--define(BU, 10).
-
-%% position alias
-position_aliases(Max) ->
-  Pos = [?SB, ?BB],
+%%
+position_names(Max) ->
+  Pos = [<<"SB">>, <<"BB">>],
   Pos1 = if
-    Max >= 4 -> Pos ++ [?UTG];
+    Max >= 4 -> Pos ++ [<<"UTG">>];
     true -> Pos
   end,
   Pos2 = Pos1 ++ case Max of
-    5 -> [?MP];
-    6 -> [?MP];
-    7 -> [?MP, ?MP1];
-    8 -> [?UTG1, ?MP, ?MP1];
-    9 -> [?UTG1, ?MP, ?MP1, ?MP2];
-    10 ->[?UTG1, ?UTG2, ?MP, ?MP1, ?MP2];
-    _Else -> Pos1
+    5 -> [<<"MP">>];
+    6 -> [<<"MP">>];
+    7 -> [<<"MP1">>, <<"MP2">>];
+    8 -> [<<"UTG+1">>, <<"MP1">>, <<"MP2">>];
+    9 -> [<<"UTG+1">>, <<"MP1">>, <<"MP2">>,  <<"MP3">>];
+    10 ->[<<"UTG+1">>, <<"UTG+2">>, <<"MP1">>, <<"MP2">>, <<"MP3">>];
+    _Else -> []
   end,
   Pos3 = if
-    Max >= 6 -> Pos2 ++ [?CO];
+    Max >= 6 -> Pos2 ++ [<<"CO">>];
     true -> Pos2
   end,
   if
-    Max >= 3 -> Pos3 ++ [?BU];
+    Max >= 3 -> Pos3 ++ [<<"BTN">>];
     true -> Pos3
   end.
 

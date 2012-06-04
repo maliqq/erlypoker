@@ -9,7 +9,7 @@ stages(Type) when Type band ?HOLDEM == ?HOLDEM ->
     {street,  "river",        [{deal, board, 1}, bets]},
     showdown
   ];
-stages(Type) when Type band ?CARD7 == ?CARD7 ->
+stages(Type) when Type band ?SEVEN_CARD == ?SEVEN_CARD ->
   [
     antes,
     {street,  "third",        [{deal, hole, 2}, {deal, door, 1}, bring_in, bets]},

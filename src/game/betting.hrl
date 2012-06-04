@@ -6,12 +6,12 @@ post_antes(Deal, []) ->
   Deal;
 
 post_antes(Deal, [Player | Left]) ->
-  Ante = bet:sizing(Deal, ?ANTE),
+  Ante = bet:sizing(Deal, ante),
   post_antes(forced_bet(Deal, Player, Ante), Left).
 
 blinds(Deal) ->
-  Deal1 = post_blind(Deal, ?SMALL_BLIND, ?SB),
-  post_blind(Deal1, ?BIG_BLIND, ?BB).
+  Deal1 = post_blind(Deal, ?SMALL_BLIND, sb),
+  post_blind(Deal1, ?BIG_BLIND, bb).
 
 post_blind(Deal, Type, Position) ->
   Amount = bet:sizing(Deal, Type),

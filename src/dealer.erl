@@ -1,5 +1,5 @@
 -module(dealer).
--export([new/0, burn/2, discard/2, hole/2, board/2, reshuffle/1]).
+-export([new/0, burn_cards/2, discard_cards/2, hole_cards/2, board_cards/2, reshuffle_cards/1]).
 
 %%
 -record(dealer, {
@@ -16,27 +16,27 @@ new() ->
   #dealer{deck = card:deck()}.
 
 %%
-take(Dealer, Num) when is_record(Dealer, dealer) ->
+get_cards(Dealer, Num) ->
   lists:sublist(Dealer#dealer.deck, 1, Num).
 
 %%
-burn(Dealer, Num) when is_record(Dealer, dealer) ->
-  Burned = take(Dealer, Num),
+burn_cards(Dealer, Num) ->
+  Burned = get_cards(Dealer, Num),
   {Burned, Dealer#dealer{
     deck = Dealer#dealer.deck -- Burned,
     burned = Dealer#dealer.burned ++ Burned
   }}.
 
 %%
-reshuffle(Dealer) ->
+reshuffle_cards(Dealer) ->
   Dealer#dealer{
     deck = card:shuffle(Dealer#dealer.deck ++ Dealer#dealer.burned),
     burned = []
   }.
 
 %%
-discard(Dealer, Cards) when is_record(Dealer, dealer) ->
-  New = take(Dealer, erlang:length(Cards)),
+discard_cards(Dealer, Cards) ->
+  New = get_cards(Dealer, erlang:length(Cards)),
   {New, Dealer#dealer{
     deck = Dealer#dealer.deck -- New,
     burned = Dealer#dealer.burned ++ Cards,
@@ -44,17 +44,17 @@ discard(Dealer, Cards) when is_record(Dealer, dealer) ->
   }}.
 
 %%
-hole(Dealer, Num) when is_record(Dealer, dealer) ->
-  Cards = take(Dealer, Num),
+hole_cards(Dealer, Num) ->
+  Cards = get_cards(Dealer, Num),
   {Cards, Dealer#dealer{
     deck = Dealer#dealer.deck -- Cards,
     dealt = Dealer#dealer.dealt ++ Cards
   }}.
 
 %%
-board(D, Num) when is_record(D, dealer) ->
-  {_, Dealer} = burn(D, 1), % burn one card
-  Cards = take(Dealer, Num),
+board_cards(D, Num) ->
+  {_, Dealer} = burn_cards(D, 1), % burn one card
+  Cards = get_cards(Dealer, Num),
   {Cards, Dealer#dealer{
     board = Dealer#dealer.board ++ Cards
   }}.
@@ -63,22 +63,22 @@ board(D, Num) when is_record(D, dealer) ->
 dealer_test() ->
   Dealer = new(),
   
-  Cards = take(Dealer, 2),
+  Cards = get_cards(Dealer, 2),
   ?assertEqual(2, erlang:length(Cards)),
   
-  {Burned, Dealer1} = burn(Dealer, 2),
+  {Burned, Dealer1} = burn_cards(Dealer, 2),
   ?assertEqual(2, erlang:length(Burned)),
   ?assertEqual([], Dealer1#dealer.burned -- Burned),
   
-  Dealer2 = reshuffle(Dealer1),
+  Dealer2 = reshuffle_cards(Dealer1),
   ?assertEqual(erlang:length(Dealer1#dealer.deck) + 2, erlang:length(Dealer2#dealer.deck)),
   
-  {Hole, Dealer3} = hole(Dealer, 2),
+  {Hole, Dealer3} = hole_cards(Dealer, 2),
   ?assertEqual([], Dealer3#dealer.dealt -- Hole),
-  {Hole2, Dealer4} = discard(Dealer3, Hole),
+  {Hole2, Dealer4} = discard_cards(Dealer3, Hole),
   ?assertEqual([], Dealer4#dealer.dealt -- Hole2),
 
   ?assertEqual([], Dealer4#dealer.burned -- Hole),
-  {Board, Dealer5} = board(Dealer, 3),
+  {Board, Dealer5} = board_cards(Dealer, 3),
   ?assertEqual([], Dealer5#dealer.board -- Board)
   .

@@ -1,3 +1,4 @@
+%%
 -record(deal, {
     id,
     game,

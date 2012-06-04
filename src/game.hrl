@@ -10,9 +10,9 @@
   }).
 
 %% limits
--define(NO_LIMIT, 1). %% NL
--define(POT_LIMIT, 2). %% PL
--define(FIXED_LIMIT, 3). %% FL
+-define(NO_LIMIT, 0). %% NL
+-define(POT_LIMIT, 1). %% PL
+-define(FIXED_LIMIT, 2). %% FL
 
 %% holdem
 -define(TEXAS, 1).
@@ -24,7 +24,7 @@
 -define(RAZZ, 6).
 -define(LONDON, 7).
 %% 5 card draw
--define(CARD5, 8).
+-define(FIVE_CARD, 8).
 -define(SINGLE27, 9).
 -define(TRIPLE27, 10).
 %% 4 card draw
@@ -32,20 +32,28 @@
 %% mixes
 -define(HORSE, 12).
 -define(HOSE, 13).
--define(MIX7, 14).
--define(MIX8, 15).
--define(MIX9, 16).
--define(MIXED_HOLDEM, 17).
--define(MIXED_STUD, 18).
--define(MIXED_DRAW, 19).
+-define(EIGHT_GAME, 14).
+-define(NINE_GAME, 15).
+
+-define(MIXED_HOLDEM, 16).
+-define(MIXED_STUD, 17).
+-define(MIXED_DRAW, 18).
+
+-define(MIXED_SEVEN_CARD, 19).
+-define(MIXED_FIVE_CARD, 20).
+
+-define(HOLDEM_OMAHA, 21).
+
 %% type groups
 -define(HOLDEM, ?TEXAS bor ?OMAHA bor ?OMAHA8). %% holdem poker
--define(CARD7, ?STUD bor ?STUD8 bor ?RAZZ bor ?LONDON). %% 7 card poker
+-define(SEVEN_CARD, ?STUD bor ?STUD8 bor ?RAZZ bor ?LONDON). %% 7 card poker
 -define(DRAW, ?CARD5 bor ?SINGLE27 bor ?TRIPLE27 bor ?BADUGI). %% draw poker
--define(MIX, ?HORSE bor ?HOSE bor ?MIX7 bor ?MIX8 bor ?MIXED_HOLDEM bor ?MIXED_STUD bor ?MIXED_DRAW). %% mixed poker
-
--define(SINGLE_DRAW, ?CARD5 bor ?SINGLE27).
+-define(SINGLE_DRAW, ?FIVE_CARD bor ?SINGLE27).
 -define(TRIPLE_DRAW, ?TRIPLE27 bor ?BADUGI).
+-define(MIX, %% mixed poker
+    ?HORSE bor ?HOSE bor ?EIGHT_GAME bor ?NINE_GAME bor
+    ?MIXED_HOLDEM bor ?MIXED_STUD bor ?MIXED_DRAW bor
+    ?MIXED_SEVEN_CARD bor ?MIXED_FIVE_CARD bor ?HOLDEM_OMAHA).
 
 -define(limits(), ["no_limit", "pot_limit", "fixed_limit"]).
 -define(games(), [
@@ -59,4 +67,3 @@
 -include("game/settings.hrl").
 -include("game/stages.hrl").
 -include("game/betting.hrl").
-
