@@ -14,3 +14,4 @@ format(Game) when is_record(Game, game) ->
 
 game_test() ->
   ok.
+
