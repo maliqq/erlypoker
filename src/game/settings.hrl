@@ -40,7 +40,7 @@ mix(Type) when Type == ?MIXED_SEVEN_CARD ->
   {fixed_limit, [?STUD, ?STUD8, ?RAZZ, ?LONDON]};
 
 mix(Type) when Type == ?MIXED_DRAW ->
-  {fixed_limit, [?BADUGI, ?FIVE_CARD, ?SINGLE27, ?TRIPLE27]}.
+  {fixed_limit, [?BADUGI, ?FIVE_CARD, ?SINGLE27, ?TRIPLE27]};
 
 mix(Type) when Type == ?MIXED_FIVE_CARD ->
   {fixed_limit, [?FIVE_CARD, ?SINGLE27, ?TRIPLE27]}.
