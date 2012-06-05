@@ -47,7 +47,7 @@
 %% type groups
 -define(HOLDEM, ?TEXAS bor ?OMAHA bor ?OMAHA8). %% holdem poker
 -define(SEVEN_CARD, ?STUD bor ?STUD8 bor ?RAZZ bor ?LONDON). %% 7 card poker
--define(DRAW, ?CARD5 bor ?SINGLE27 bor ?TRIPLE27 bor ?BADUGI). %% draw poker
+-define(DRAW, ?FIVE_CARD bor ?SINGLE27 bor ?TRIPLE27 bor ?BADUGI). %% draw poker
 -define(SINGLE_DRAW, ?FIVE_CARD bor ?SINGLE27).
 -define(TRIPLE_DRAW, ?TRIPLE27 bor ?BADUGI).
 -define(MIX, %% mixed poker
