@@ -46,7 +46,7 @@ mix(Type) when Type == ?MIXED_FIVE_CARD ->
   {fixed_limit, [?FIVE_CARD, ?SINGLE27, ?TRIPLE27]}.
 
 %% game default options for specific game type
-defaults(Type) when Type band ?CARD7 == ?CARD7 ->
+defaults(Type) when Type band ?SEVEN_CARD == ?SEVEN_CARD ->
   [
     {vela,          true}, %% 1 card board
     {hole_cards,    7},
@@ -104,7 +104,7 @@ options(Type) when Type == ?LONDON ->
   [
     {ranking,       ace_six}
   ];
-options(Type) when Type == ?CARD5 ->
+options(Type) when Type == ?FIVE_CARD ->
   [
     {ranking,       high},
     {hole_cards,    5}
